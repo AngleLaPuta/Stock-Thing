@@ -1,0 +1,43 @@
+Strategy Name,Return%
+Perfect Foresight (Max Return Short Benchmark),1.6277%
+Perfect Foresight (Max Return Long Benchmark),1.1561%
+Q-Agent (SPXUSD),0.1552%
+MACD Crossover (100% Cash),0.1340%
+Random Trader (12% Hourly),0.1007%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.0879%
+Random Trader (1% Chance),0.0428%
+EMA Crossover (100% Cash),-0.0062%
+SMA Derivative Trade,-0.0087%
+MACD Crossover (100% Cash),-0.0248%
+All-In-One Hybrid (1/5th Split),-0.0914%
+SMA Crossover (100% Cash),-0.1090%
+MACD Histo Derivative (100% Cash),-0.3083%
+Swing Low Support (15m),-0.3523%
+Perfect Foresight (Max Return Long Benchmark),1.0077%
+Perfect Foresight (Max Return Short Benchmark),0.8503%
+Random Trader (1% Chance),0.1349%
+Swing Low Support (15m),0.0522%
+MACD Crossover (100% Cash),-0.0058%
+Random Trader (12% Hourly),-0.0155%
+MACD Crossover (100% Cash),-0.0290%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.0540%
+SMA Derivative Trade,-0.0580%
+All-In-One Hybrid (1/5th Split),-0.0826%
+EMA Crossover (100% Cash),-0.0985%
+SMA Crossover (100% Cash),-0.0985%
+MACD Histo Derivative (100% Cash),-0.1286%
+Q-Agent (SPXUSD),-0.1343%
+Perfect Foresight (Max Return Short Benchmark),0.9407%
+Perfect Foresight (Max Return Long Benchmark),0.8781%
+EMA Crossover (100% Cash),0.5382%
+MACD Histo Derivative (100% Cash),0.2829%
+All-In-One Hybrid (1/5th Split),0.2011%
+Swing Low Support (15m),0.1345%
+SMA Crossover (100% Cash),0.1275%
+MACD Crossover (100% Cash),0.0569%
+Q-Agent (SPXUSD),0.0425%
+SMA Derivative Trade,0.0000%
+Random Trader (12% Hourly),-0.0124%
+Random Trader (1% Chance),-0.0140%
+MACD Crossover (100% Cash),-0.0423%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.1550%

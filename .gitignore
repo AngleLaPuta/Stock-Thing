@@ -1,2 +1,5 @@
 /.idea
 /pyfinancialdata/
+/__pycache__
+/qlearning_results/screenshots
+/__pycache__

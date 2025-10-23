@@ -1,7 +1,8 @@
 import pandas as pd
 from datetime import time
 import numpy as np
-
+import os
+import ast
 
 # --- Utility/Indicator Functions ---
 
@@ -883,34 +884,53 @@ class PerfectForesightStrategy(BaseStrategy):
         if trading_hours_df.empty:
             return self.initial_capital
 
-        lowest_close = trading_hours_df['Close'].min()
-        highest_close = trading_hours_df['Close'].max()
+        # --- Corrected Logic: Find Max Profit Pair (Buy Low, Sell High, Buy before Sell) ---
 
-        if lowest_close >= highest_close:
+        best_profit = -float('inf')
+        buy_index_time = None
+        sell_index_time = None
+
+        # Iterate through all possible buy points (as lowest low)
+        for i in range(len(trading_hours_df) - 1):
+            current_buy_row = trading_hours_df.iloc[i]
+            buy_price = current_buy_row['Close']
+
+            # Look for the highest sell price *after* the current buy point
+            # Use .iloc[i+1:] to ensure the sell is strictly after the buy
+            future_df = trading_hours_df.iloc[i + 1:]
+
+            if future_df.empty:
+                continue
+
+            highest_future_close = future_df['Close'].max()
+
+            if highest_future_close > buy_price:
+                current_profit = (highest_future_close - buy_price) / buy_price
+
+                if current_profit > best_profit:
+                    best_profit = current_profit
+                    buy_index_time = current_buy_row.name
+
+                    # Find the corresponding sell index time
+                    # We take the *first* highest close after the buy point for simplicity,
+                    # but taking the last one is also valid for maximizing the position time.
+                    sell_index_time = future_df[future_df['Close'] == highest_future_close].index[0]
+
+        # If no profitable trade is found, return initial capital
+        if best_profit <= 0 or buy_index_time is None:
             return self.initial_capital
 
-        # Find the first time of the lowest close
-        buy_index_time = trading_hours_df[trading_hours_df['Close'] == lowest_close].index[0]
-
-        # Find the last time of the highest close that occurs *after* the buy
-        sell_index_time_candidates = trading_hours_df[
-            (trading_hours_df['Close'] == highest_close) &
-            (trading_hours_df.index > buy_index_time)
-            ]
-
-        if sell_index_time_candidates.empty:
-            sell_index_time = trading_hours_df.index[-1]
-        else:
-            sell_index_time = sell_index_time_candidates.index[-1]
+        # --- End Corrected Logic ---
 
         for index, row in analysis_df.iterrows():
             self._update_portfolio(index, row)
 
+            # Check if current time is the optimal buy time
             if index == buy_index_time and self.shares < 0.01:
                 # Perfect Buy
-                shares_bought = self.initial_capital / lowest_close
+                shares_bought = self.initial_capital / row['Close']  # Use the actual close price at the time
                 self.trade_log.append({
-                    'Time': buy_index_time, 'Type': 'BUY (LONG)', 'Price': lowest_close,
+                    'Time': buy_index_time, 'Type': 'BUY (LONG)', 'Price': row['Close'],
                     'Shares': shares_bought, 'Value': self.initial_capital, 'Strategy': self.strategy_name
                 })
                 self.buy_dates.append(buy_index_time)
@@ -919,11 +939,12 @@ class PerfectForesightStrategy(BaseStrategy):
                 self.invested_value = self.initial_capital
                 self.peak_invested_value = self.initial_capital
 
+            # Check if current time is the optimal sell time
             elif index == sell_index_time and self.shares > 0.01:
                 # Perfect Sell
-                cash_received = self.shares * highest_close
+                cash_received = self.shares * row['Close']  # Use the actual close price at the time
                 self.trade_log.append({
-                    'Time': sell_index_time, 'Type': 'SELL (PERFECT)', 'Price': highest_close,
+                    'Time': sell_index_time, 'Type': 'SELL (PERFECT)', 'Price': row['Close'],
                     'Shares': self.shares, 'Value': cash_received, 'Strategy': self.strategy_name
                 })
                 self.sell_dates_signal.append(sell_index_time)
@@ -932,8 +953,7 @@ class PerfectForesightStrategy(BaseStrategy):
                 self.invested_value = 0.0
                 self.peak_invested_value = 0.0
 
-
-        # Ensure final update if trade happened on the last bar
+        # Ensure final update
         return self._calculate_current_portfolio_value(analysis_df.iloc[-1]['Close'])
 
 
@@ -955,48 +975,65 @@ class PerfectShortForesightStrategy(InverseBaseStrategy):
         if trading_hours_df.empty:
             return self.initial_capital
 
-        highest_close = trading_hours_df['Close'].max()
-        lowest_close = trading_hours_df['Close'].min()
+        # --- Corrected Logic: Find Max Profit Pair (Short High, Cover Low, Short before Cover) ---
 
-        if lowest_close >= highest_close:
+        best_profit = -float('inf')
+        short_index_time = None
+        cover_index_time = None
+
+        # Iterate through all possible short points (as highest high)
+        for i in range(len(trading_hours_df) - 1):
+            current_short_row = trading_hours_df.iloc[i]
+            short_price = current_short_row['Close']
+
+            # Look for the lowest cover price *after* the current short point
+            # Use .iloc[i+1:] to ensure the cover is strictly after the short
+            future_df = trading_hours_df.iloc[i + 1:]
+
+            if future_df.empty:
+                continue
+
+            lowest_future_close = future_df['Close'].min()
+
+            # Profit in a short is the initial high price minus the later low price
+            if short_price > lowest_future_close:
+                current_profit = (short_price - lowest_future_close) / short_price
+
+                if current_profit > best_profit:
+                    best_profit = current_profit
+                    short_index_time = current_short_row.name
+
+                    # Find the corresponding cover index time
+                    cover_index_time = future_df[future_df['Close'] == lowest_future_close].index[0]
+
+        # If no profitable trade is found, or if shorting would lead to a loss, return initial capital
+        if best_profit <= 0 or short_index_time is None:
             return self.initial_capital
 
-        # Find the first time of the highest close
-        short_index_time = trading_hours_df[trading_hours_df['Close'] == highest_close].index[0]
-
-        # Find the last time of the lowest close that occurs *after* the short
-        cover_index_time_candidates = trading_hours_df[
-            (trading_hours_df['Close'] == lowest_close) &
-            (trading_hours_df.index > short_index_time)
-            ]
-
-        if cover_index_time_candidates.empty:
-            cover_index_time = trading_hours_df.index[-1]
-        else:
-            cover_index_time = cover_index_time_candidates.index[-1]
+        # --- End Corrected Logic ---
 
         for index, row in analysis_df.iterrows():
             self._update_portfolio(index, row)
 
             if index == short_index_time and self.shares > -0.01:
-                # Perfect Short
-                shares_shorted = self.initial_capital_base / highest_close
+                # Perfect Short (Sell)
+                shares_shorted = self.initial_capital_base / row['Close']  # Use the actual close price at the time
                 self.trade_log.append({
-                    'Time': short_index_time, 'Type': 'SELL (SHORT)', 'Price': highest_close,
+                    'Time': short_index_time, 'Type': 'SELL (SHORT)', 'Price': row['Close'],
                     'Shares': shares_shorted, 'Value': self.initial_capital_base, 'Strategy': self.strategy_name
                 })
                 self.sell_dates_signal.append(short_index_time)
                 self.shares = -shares_shorted
                 self.cash += self.initial_capital_base
                 self.entry_value = self.initial_capital_base
-                self.invested_value = abs(self.shares) * highest_close
+                self.invested_value = abs(self.shares) * row['Close']
                 self.peak_invested_value = self.invested_value
 
             elif index == cover_index_time and self.shares < -0.01:
-                # Perfect Cover
-                cash_used_to_cover = abs(self.shares) * lowest_close
+                # Perfect Cover (Buy)
+                cash_used_to_cover = abs(self.shares) * row['Close']  # Use the actual close price at the time
                 self.trade_log.append({
-                    'Time': cover_index_time, 'Type': 'BUY (COVER: PERFECT)', 'Price': lowest_close,
+                    'Time': cover_index_time, 'Type': 'BUY (COVER: PERFECT)', 'Price': row['Close'],
                     'Shares': abs(self.shares), 'Value': cash_used_to_cover, 'Strategy': self.strategy_name
                 })
                 self.buy_dates.append(cover_index_time)
@@ -1005,5 +1042,129 @@ class PerfectShortForesightStrategy(InverseBaseStrategy):
                 self.invested_value = 0.0
                 self.peak_invested_value = 0.0
 
-        # Ensure final update if trade happened on the last bar
+        # Ensure final update
         return self._calculate_current_portfolio_value(analysis_df.iloc[-1]['Close'])
+
+# --- Q-Learning Specific Utility ---
+
+def get_state(df_row: pd.Series, ticker: str = 'SPXUSD') -> tuple:
+    """
+    Discretizes the continuous indicators into a state tuple.
+    NOTE: This must exactly match the state definition used during training.
+    """
+    # 1. EMA_8 vs SMA_55 Cross (Indicators must be present in df_row index)
+    ema8 = df_row['EMA_8']
+    sma55 = df_row['SMA_55']
+    ema_cross_state = 0
+    if ema8 > sma55 * 1.0005:  # 0.05% buffer for Bullish
+        ema_cross_state = 1
+    elif ema8 < sma55 * 0.9995:  # 0.05% buffer for Bearish
+        ema_cross_state = -1
+
+    # 2. MACD Histogram (Positive/Negative)
+    macd_histo = df_row['MACD_Histogram']
+    macd_state = 0
+    if macd_histo > 0.005:  # Small threshold for 'Positive'
+        macd_state = 1
+    elif macd_histo < -0.005:  # Small threshold for 'Negative'
+        macd_state = -1
+
+    # 3. SMA Slope (Positive/Negative)
+    sma_slope = df_row['SMA_Slope_1m']
+    slope_state = 0
+    if sma_slope > 0.005:  # Small percentage threshold
+        slope_state = 1
+    elif sma_slope < -0.005:  # Small percentage threshold
+        slope_state = -1
+
+    return (ema_cross_state, macd_state, slope_state)
+
+
+# --- Q-Learning Strategy Implementation ---
+
+class QLearningStrategy(BaseStrategy):
+    """
+    A trading strategy that uses a loaded Q-Table to make buy/sell decisions.
+    """
+
+    def __init__(self, model_ticker: str, initial_capital=1000.0, stop_loss_percent=0.01,
+                 model_dir='qlearning_results'):
+        super().__init__(initial_capital=initial_capital, stop_loss_percent=stop_loss_percent)
+
+        self.strategy_name = f"Q-Agent ({model_ticker})"
+        self.model_ticker = model_ticker
+        self.q_table = self._load_q_table(model_dir, model_ticker)
+
+        self.action_map = {0: 'Hold', 1: 'Buy', 2: 'Sell'}
+        self.last_action = 0
+
+    def _load_q_table(self, model_dir, model_ticker):
+        """Loads the Q-Table CSV file into a dictionary."""
+        # Note: We hardcode the trained ticker as SPXUSD/MOCK since the Q-table name depends on the training data.
+        TICKER_SYMBOL_TRAINED = 'SPXUSD'  # Change to 'MOCK' if you trained on mock data
+        model_filename = os.path.join(model_dir, f'q_table_{TICKER_SYMBOL_TRAINED}_model.ai')
+
+        if not os.path.exists(model_filename):
+            print(f"FATAL: Q-Table not found at {model_filename}. Q-Agent defaulting to HOLD.")
+            return {}
+
+        try:
+            q_table_df = pd.read_csv(model_filename, index_col=0)
+            q_table = {ast.literal_eval(k): v.values for k, v in q_table_df.iterrows()}
+            print(f"✅ Q-Table loaded successfully for Q-Agent testing.")
+            return q_table
+        except Exception as e:
+            print(f"ERROR: Failed to parse Q-Table CSV: {e}")
+            return {}
+
+    def run_strategy(self, analysis_df: pd.DataFrame):
+        """
+        Executes the strategy based on Q-Table lookups (Exploitation).
+        """
+        for index, row in analysis_df.iterrows():
+            if pd.isna(row['Close']):
+                continue
+            if index.time() < time(10, 0):
+                continue
+            # 1. Update Portfolio and Check Stop Loss
+            self._update_portfolio(index, row)
+
+            # End of Day Check (Close out position at 15:59 ET)
+            if index.time() == time(15, 59):
+                if self.shares > 0.01:
+                    self._execute_sell(row, "EOD")
+                continue
+
+            if self._check_stop_loss(row):
+                self.last_action = 2
+                continue
+
+            # 2. Determine Current State
+            current_state = get_state(row, self.model_ticker)
+
+            # 3. Choose Action (Exploitation)
+            if current_state in self.q_table:
+                action_index = np.argmax(self.q_table[current_state])
+            else:
+                action_index = 0  # Unseen state, default to HOLD
+
+            action = self.action_map[action_index]
+
+            # 4. Execute Action
+            if action == 'Buy':
+                if self.shares < 0.01 and not self.trade_today:
+                    if self.cash > 0.01:
+                        self._execute_buy(row, self.cash)
+                        self.last_action = 1
+
+            elif action == 'Sell':
+                if self.shares > 0.01:
+                    self._execute_sell(row, "SIGNAL")
+                    self.last_action = 2
+
+        # Final close out if not done at 15:59
+        final_close = analysis_df.iloc[-1]
+        if self.shares > 0.01:
+            self._execute_sell(final_close, "EOD")
+
+        return self._calculate_current_portfolio_value(final_close['Close'])
