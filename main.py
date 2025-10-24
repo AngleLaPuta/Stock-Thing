@@ -355,7 +355,7 @@ def amazingprogram(ticker,plot=True):
             })
 
         leaderboard_data.sort(key=lambda x: x['final_value'], reverse=True)
-        if not plot:
+        if plot:
             print(f"\n" + "=" * 60)
             print(f"🥇 STRATEGY LEADERBOARD (Ranked by Final Value) 🥇")
             print(f"Initial Capital: ${initial_capital:.2f} on {test_date.strftime('%Y-%m-%d')}")
