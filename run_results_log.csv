@@ -255,3 +255,19 @@ All-In-One Hybrid (1/5th Split),-0.0914%
 SMA Crossover (100% Cash),-0.1090%
 MACD Histo Derivative (100% Cash),-0.3083%
 Swing Low Support (15m),-0.3523%
+Perfect Foresight (Max Return Short Benchmark),3.2398%
+Perfect Foresight (Max Return Long Benchmark),3.1991%
+Random Trader (1% Chance),2.4043%
+MACD Histo Derivative (100% Cash),0.5392%
+Random Trader (12% Hourly),0.1826%
+DQN-Agent (SPY),0.1264%
+All-In-One Hybrid (1/5th Split),0.0600%
+MACD Crossover (100% Cash),0.0476%
+Swing Low Support (15m),0.0240%
+SMA Derivative Trade,0.0000%
+SMA Crossover (100% Cash),-0.0472%
+MACD Crossover (100% Cash),-0.1072%
+EMA Crossover (100% Cash),-0.2398%
+Q-Agent (SPY),-0.6242%
+LSTM-Prediction Agent (SPY),-0.6473%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.6774%
