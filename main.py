@@ -7,14 +7,16 @@ from random import choice, randint
 from matplotlib import gridspec
 import numpy as np
 import os
+from trainLSTM import plot_price_path_comparison
 from leaderboardd import generate_profit_plot_and_leaderboard
 
 from strats import *
 
 
-def plot_comparison_results(analysis_df: pd.DataFrame, all_strategies: list[BaseStrategy], ticker_symbol: str):
+def plot_comparison_results(analysis_df: pd.DataFrame, all_strategies: list, ticker_symbol: str, plot: bool):
     """
     Generates a multi-panel plot comparing price action, indicators, and strategy performance.
+    Saves the plot to a file if 'plot' is False, otherwise displays it.
     """
     plt.style.use('seaborn-v0_8-whitegrid')
 
@@ -148,24 +150,24 @@ def plot_comparison_results(analysis_df: pd.DataFrame, all_strategies: list[Base
 
     for strategy in all_strategies:
 
-        final_value = strategy.portfolio_value_history[
-            -1] if strategy.portfolio_value_history else strategy.initial_capital
 
-        if final_value > strategy.initial_capital:
-            series = get_portfolio_series(strategy, plot_index)
 
-            if not series.empty:
-                name = strategy.strategy_name.replace(" (SPXUSD)", "")
-                color = strategy_plot_colors.get(name, strategy_colors.get(strategy.strategy_name, np.random.rand(3, )))
-                linestyle = '-'
-                linewidth = 3 if 'Perfect' in strategy.strategy_name else 1.5
 
-                if 'Q-Agent' in strategy.strategy_name:
-                    name = 'Q-Learning Agent'
-                    linewidth = 2.5
-                    linestyle = '-.'
+        series = get_portfolio_series(strategy, plot_index)
 
-                series.plot(ax=ax4, linewidth=linewidth, color=color, linestyle=linestyle, label=name)
+        if not series.empty:
+            name = strategy.strategy_name.replace(" (SPXUSD)", "")
+            color = strategy_plot_colors.get(name, strategy_colors.get(strategy.strategy_name, np.random.rand(3, )))
+            linestyle = '-'
+            linewidth = 3 if 'Perfect' in strategy.strategy_name else 1.5
+
+            if 'Q-Agent' in strategy.strategy_name:
+                name = 'Q-Learning Agent'
+                linewidth = 2.5
+                linestyle = '-.'
+
+            series.plot(ax=ax4, linewidth=linewidth, color=color, linestyle=linestyle, label=name)
+
 
     ax4.set_title(f'Portfolio Value Comparison Over Time (One Day) - {ticker_symbol}',
                   fontsize=16, fontweight='bold')
@@ -181,10 +183,28 @@ def plot_comparison_results(analysis_df: pd.DataFrame, all_strategies: list[Base
     plt.setp(ax4.get_xticklabels(), rotation=0, ha='center', fontsize=9)
 
     plt.tight_layout()
-    plt.show()
+
+
+    if plot:
+        plt.show()
+    else:
+
+        output_dir = 'output'
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        filename = f"{ticker_symbol}_{display_date}_comparison.png"
+        save_path = os.path.join(output_dir, filename)
+
+        fig.savefig(save_path)
+        plt.close(fig)
+        print(f"\n" + "=" * 80)
+        print(f"📈 Plot saved to file: '{save_path}'")
+        print("=" * 80)
 
 
 def print_trade_summary(strategies):
+
     """
     Prints a chronological summary of all trades executed by all strategies.
     """
@@ -231,7 +251,9 @@ def print_trade_summary(strategies):
 
 RESULTS_LOG_FILE = 'run_results_log.csv'
 
+
 def append_run_results(leaderboard_data: list[dict]):
+
     """
     Appends the Strategy Name and Return% of all strategies to the end of a CSV file.
     A new file is created with a header if it doesn't exist.
@@ -260,7 +282,7 @@ def append_run_results(leaderboard_data: list[dict]):
     print("=" * 80)
 
 
-def amazingprogram(ticker,plot=True):
+def amazingprogram(ticker, plot=True):
     """
     Main function to download data, calculate indicators, run strategies, and plot results.
     """
@@ -272,6 +294,7 @@ def amazingprogram(ticker,plot=True):
     print(f"--- Running Strategies for {ticker_symbol} with data from {start_date} to {end_date} ---")
 
     try:
+
         df = yf.download(ticker_symbol, start=start_date, end=end_date, interval="1m", auto_adjust=False)
 
         if df.columns.nlevels > 1:
@@ -287,6 +310,8 @@ def amazingprogram(ticker,plot=True):
         df = df[df.index.hour < 16]
         df = df[~((df.index.hour == 16) & (df.index.minute == 0))]
 
+
+
         df['SMA_13'] = calculate_sma(df, period=13)
         df['SMA_21'] = calculate_sma(df, period=21)
         df['SMA_55'] = calculate_sma(df, period=55)
@@ -296,6 +321,13 @@ def amazingprogram(ticker,plot=True):
         macd_results = calculate_macd(df)
         df = df.join(macd_results)
         df['SMA_Slope_1m'] = calculate_sma_slope(df, sma_period=50)
+
+
+        df['Price_Change'] = df['Close'].pct_change() * 100
+        df['Close_vs_EMA200'] = (df['Close'] - df['EMA_200']) / df['EMA_200'] * 100
+        df['MACD_vs_Signal'] = (df['MACD'] - df['Signal_Line']) / df['Signal_Line'].abs().replace(0, 1e-6) * 100
+        df['EMA8_vs_SMA55'] = (df['EMA_8'] - df['SMA_55']) / df['SMA_55'] * 100
+        df['Volatility_Range'] = (df['High'] - df['Low']) / df['Close']
 
         analysis_df = df.dropna()
 
@@ -320,13 +352,18 @@ def amazingprogram(ticker,plot=True):
         initial_capital = 1000.0
         stop_loss = 0.01
 
-        MODEL_TICKER = 'SPXUSD'
+        MODEL_TICKER = 'SPY'
 
         print(f"\nTrading and plotting results for: {test_date.strftime('%Y-%m-%d')} (Trading starts at 09:30 AM ET)")
 
+
+
         strategies = [
             QLearningStrategy(model_ticker=MODEL_TICKER, initial_capital=initial_capital, stop_loss_percent=stop_loss),
-
+            DQNStrategy(model_ticker=MODEL_TICKER, initial_capital=initial_capital,
+                        stop_loss_percent=stop_loss, model_dir='dqn_results'),
+            LSTMStrategy(model_ticker=MODEL_TICKER, initial_capital=initial_capital,
+                         stop_loss_percent=stop_loss, model_dir='lstm_results_v2'),
             MACDStrategy(initial_capital=initial_capital, stop_loss_percent=stop_loss),
             EMACrossoverStrategy(initial_capital=initial_capital, stop_loss_percent=stop_loss),
             SMACrossoverStrategy(initial_capital=initial_capital, stop_loss_percent=stop_loss),
@@ -343,6 +380,7 @@ def amazingprogram(ticker,plot=True):
             PerfectShortForesightStrategy(initial_capital=initial_capital, stop_loss_percent=stop_loss)
         ]
 
+
         leaderboard_data = []
         for strategy in strategies:
             final_value = strategy.run_strategy(single_day_df.copy())
@@ -355,6 +393,8 @@ def amazingprogram(ticker,plot=True):
             })
 
         leaderboard_data.sort(key=lambda x: x['final_value'], reverse=True)
+
+
         if plot:
             print(f"\n" + "=" * 60)
             print(f"🥇 STRATEGY LEADERBOARD (Ranked by Final Value) 🥇")
@@ -385,14 +425,20 @@ def amazingprogram(ticker,plot=True):
 
             print("=" * 60)
 
+
         if plot:
             print_trade_summary(strategies)
-            plot_comparison_results(single_day_df, strategies, ticker_symbol)
+
+        plot_comparison_results(single_day_df, strategies, ticker_symbol, plot=plot)
+
+
 
         append_run_results(leaderboard_data)
         generate_profit_plot_and_leaderboard()
+
     except Exception as e:
         print(f"An error occurred during execution: {e}")
+
 
 if __name__ == "__main__":
     stock_tickers = [
@@ -400,4 +446,7 @@ if __name__ == "__main__":
         "JPM", "V", "MA", "XOM", "CVX", "LLY", "JNJ", "WMT", "COST", "HD",
         "NFLX", "T", "SPY", "QQQ", "DIA"
     ]
+
+
+
     amazingprogram(choice(stock_tickers))

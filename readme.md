@@ -40,6 +40,32 @@ The current training data is a limited set (approx. 200 data points), primarily 
 
 The immediate focus will be on **diversifying the training data** to include multiple years and varied market environments, aiming for a more robust and generalized trading model.
 
+
+## 📅 October 24, 2025 Update
+
+Trained the **Q-Learning agent** overnight with an extended runtime. Unfortunately, performance **deteriorated** on a longer simulation of **208 days**.
+
+### Revised Performance Summary (208 Simulated Days)
+
+| Metric | Q-Agent Performance | Optimal Strategy Benchmark | Target Goal |
+| :--- | :--- | :--- | :--- |
+| **Total Return** | **1.75%** | **1429.03%** | N/A |
+| **Average Daily Return** | **0.01%** | **1.32%** | **0.30% to 0.40%** |
+| **Agent Rank** | **8th** of tested strategies | **1st** (Benchmark) | N/A |
+
+---
+
+### Key Issues & Next Steps
+
+* **Plateaued Accuracy:** The training accuracy has plateaued significantly, showing **no improvement** despite increased training time. This suggests the **Q-Learning model** may be fundamentally inadequate for the task.
+* **Model Shift:** Given the poor generalization and plateauing, the immediate focus is shifting away from simple Q-Learning. I will research and pivot to more advanced techniques like **Deep Learning (DL)**.
+* **Initial DL Experiment:** I have added an **LSTM (Long Short-Term Memory) predictive model** to the test pool, aiming to predict the stock curve and invest based on that prediction.
+    * **LSTM Status:** The LSTM models currently rank **3rd, 4th, and 5th** among all strategies. They are the **most profitable** next to the two "perfect foresight" benchmarks, though still significantly underperforming the perfect benchmark's returns. Training will continue to improve their performance.
+* **New Strategy Concept:** I plan to develop a new, conditional strategy:
+    * Based on market data (graphs) from the **9:30 AM to 10:30 AM** window, the model will attempt to **predict (generate) the rest of the day's price plot**.
+    * This predicted plot will then be fed to the "perfect fit" (buy at the lowest, sell at the highest) algorithm to determine the optimal entry/exit strategy for the rest of the day.
+
+
 ---
 
 ## 💡 Motivation

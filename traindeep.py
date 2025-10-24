@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib import gridspec
 import random
-from pyfinancialdata import get_multi_year
+from pyfinancialdata import *
 from datetime import time, timedelta, datetime
 from random import choice
 import os
@@ -14,13 +14,6 @@ import torch.nn as nn
 import torch.optim as optim
 from collections import deque
 
-from trainq import train_single_episode, load_q_table_for_training
-from traindeep import *
-from trainLSTM import *
-from main import amazingprogram
-
-
-
 
 
 
@@ -28,38 +21,107 @@ from main import amazingprogram
 TICKER_SYMBOL_TRAINED = 'SPY'
 PLOT_DAYS = 100
 
-
 LEARNING_RATE = 0.0001
 GAMMA = 0.99
 BATCH_SIZE = 64
 REPLAY_MEMORY_SIZE = 10000
 TARGET_UPDATE_FREQ = 1000
+
+
 EPSILON_START = 1.0
 EPSILON_END = 0.01
 EPSILON_DECAY = 0.99995
+
 ACTION_MAP = {0: 'Hold', 1: 'Buy', 2: 'Sell'}
 NUM_ACTIONS = len(ACTION_MAP)
 INITIAL_CAPITAL = 1000.0
+
+
 ACCURACY_START_EPISODE = 100
 STATE_SIZE = 12
 
 
-LSTM_HIDDEN_DIM = 64
-LSTM_NUM_LAYERS = 2
-LSTM_LEARNING_RATE = 0.001
 
-LSTM_INPUT_FEATURES = 7
-
-
-MODEL_CONFIGS = [
-    {'name': 'QL_SPY', 'type': 'QL', 'ticker': 'SPY', 'save_dir': 'qlearning_results'},
-    {'name': 'DQN_SPY', 'type': 'DQN', 'ticker': 'SPY', 'save_dir': 'dqn_results'},
-    {'name': 'LSTM_SPY', 'type': 'LSTM', 'ticker': 'SPY', 'save_dir': 'lstm_results_v2'},
-]
-SESSION_EPISODES = 9999999999999
+SAVE_DIR = 'dqn_results'
+os.makedirs(SAVE_DIR, exist_ok=True)
+os.makedirs(os.path.join(SAVE_DIR, 'weights'), exist_ok=True)
 
 
 
+class BaseStrategy:
+    """Class to hold results for P&L plotting."""
+
+    def __init__(self, name, initial_capital=INITIAL_CAPITAL, is_long_only=True):
+        self.strategy_name = name
+        self.initial_capital = initial_capital
+        self.is_long_only = is_long_only
+        self.buy_dates = []
+        self.sell_dates_signal = []
+        self.portfolio_dates = [pd.NaT]
+        self.portfolio_value_history = [initial_capital]
+
+    def record_trade(self, df_day: pd.DataFrame, trades: list, perfect_trade_mode=False):
+        self.buy_dates = []
+        self.sell_dates_signal = []
+
+        buys = [(p, t, a) for p, t, a in trades if a == 1]
+        sells = [(p, t, a) for p, t, a in trades if a == 2]
+
+        if not buys or not sells:
+            self.portfolio_dates = df_day.index.tolist()
+            self.portfolio_value_history = [self.initial_capital] * len(df_day.index)
+            return
+
+        buy_price, buy_time, _ = buys[0]
+        sell_price, sell_time, _ = sells[-1]
+        self.buy_dates = [buy_time]
+        self.sell_dates_signal = [sell_time]
+
+        shares = self.initial_capital / buy_price if buy_price > 0 else 0
+
+        current_capital = self.initial_capital
+        portfolio_history = {}
+
+        portfolio_history[df_day.index.min()] = self.initial_capital
+
+        holding = False
+
+        for idx, row in df_day.iterrows():
+            try:
+                close_price = row[TICKER_SYMBOL_TRAINED, 'Close']
+            except KeyError:
+                close_price = row['Close']
+
+            if not holding and idx >= buy_time:
+                portfolio_history[buy_time] = self.initial_capital
+                holding = True
+
+            if holding and idx >= sell_time:
+                final_value = shares * sell_price
+                portfolio_history[sell_time] = final_value
+                holding = False
+                current_capital = final_value
+
+            if holding:
+                portfolio_history[idx] = shares * close_price
+
+            elif idx > sell_time:
+                portfolio_history[idx] = current_capital
+
+            elif idx < buy_time:
+                portfolio_history[idx] = self.initial_capital
+
+        self.portfolio_dates = list(portfolio_history.keys())
+        self.portfolio_value_history = list(portfolio_history.values())
+
+        history_series = pd.Series(self.portfolio_value_history, index=self.portfolio_dates)
+        history_series = history_series[~history_series.index.duplicated(keep='last')]
+        history_series.sort_index(inplace=True)
+
+        history_series = history_series.reindex(df_day.index, method='ffill').dropna()
+
+        self.portfolio_dates = history_series.index.tolist()
+        self.portfolio_value_history = history_series.values.tolist()
 
 
 
@@ -93,6 +155,24 @@ def calculate_macd(df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame({'MACD': macd_line, 'Signal_Line': signal_line, 'MACD_Histogram': macd_histogram})
 
 
+def calculate_sma_slope(df: pd.DataFrame, sma_period: int) -> pd.Series:
+    sma_col_name = f'SMA_{sma_period}'
+    if sma_col_name not in df.columns:
+        temp_df = pd.DataFrame(index=df.index)
+        temp_df['Close'] = get_close_col(df)
+        df[sma_col_name] = calculate_sma(temp_df, sma_period)
+
+    if df.columns.nlevels == 1 and sma_col_name in df.columns:
+        sma_series = df[sma_col_name]
+    elif df.columns.nlevels > 1 and (TICKER_SYMBOL_TRAINED, sma_col_name) in df.columns:
+        sma_series = df[TICKER_SYMBOL_TRAINED, sma_col_name]
+    else:
+        return pd.Series(0.0, index=df.index)
+
+    return sma_series.diff() / sma_series.shift(1) * 100
+
+
+
 def filter_market_hours(df: pd.DataFrame) -> pd.DataFrame:
     df.index = df.index.tz_convert('America/New_York')
     df = df[df.index.dayofweek < 5]
@@ -102,7 +182,7 @@ def filter_market_hours(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def reformat_local_data(df, ticker=TICKER_SYMBOL_TRAINED):
+def reformat_local_data(df, ticker='SPXUSD'):
     column_mapping = {'open': 'Open', 'high': 'High', 'low': 'Low', 'close': 'Close', 'price': 'Adj Close'}
     df.rename(columns=column_mapping, inplace=True)
     if 'Volume' not in df.columns: df['Volume'] = 0
@@ -153,119 +233,6 @@ def add_indicators_to_local_data(df: pd.DataFrame, ticker: str):
     return final_df.sort_index(axis=1)
 
 
-def plot_price_path_comparison(
-        analysis_df: pd.DataFrame,
-        plot_data: dict,
-        ticker_symbol: str,
-        file_path: str,
-
-        predicted_path_prices: np.ndarray = None,
-        predicted_path_times: pd.DatetimeIndex = None
-):
-    """
-    Plots the actual price action and a path derived from model prediction
-    (either a full path array or a polynomial approximation of key points).
-    """
-    plt.style.use('seaborn-v0_8-whitegrid')
-
-    day = analysis_df.index.normalize().min()
-    date_str = day.strftime('%Y-%m-%d')
-
-
-
-    df_day_slice = analysis_df.loc[date_str].copy()
-
-
-    if isinstance(df_day_slice.columns, pd.MultiIndex):
-        close_series = df_day_slice.swaplevel(0, 1, axis=1)[ticker_symbol]['Close']
-    else:
-
-        close_series = df_day_slice['Close']
-
-    start_time = plot_data['start_time']
-    end_time = plot_data['end_time']
-
-
-    if predicted_path_prices is not None and predicted_path_times is not None:
-
-        predicted_curve_times = predicted_path_times
-        predicted_prices = predicted_path_prices
-        path_label = 'Model Predicted Path'
-    else:
-
-        path_label = 'Predicted Path (Polynomial Approximation)'
-
-
-        points = [
-            (start_time, plot_data['start_price']),
-            (plot_data['high_time'], plot_data['high_price']),
-            (plot_data['low_time'], plot_data['low_price']),
-            (end_time, plot_data['end_price'])
-        ]
-
-
-        points.sort(key=lambda x: x[0])
-
-        times_numeric = np.array([mdates.date2num(t) for t, p in points])
-        prices = np.array([p for t, p in points])
-
-
-        predicted_curve_times = pd.date_range(start=start_time, end=end_time, freq='min', tz=day.tz)
-        predicted_curve_times_numeric = np.array([mdates.date2num(t) for t in predicted_curve_times])
-
-
-        if len(times_numeric) >= 4:
-            p_fit = np.polyfit(times_numeric, prices, deg=3)
-            p_poly = np.poly1d(p_fit)
-            predicted_prices = p_poly(predicted_curve_times_numeric)
-        else:
-
-            predicted_prices = np.interp(predicted_curve_times_numeric, times_numeric, prices)
-
-
-    fig, ax = plt.subplots(figsize=(14, 7))
-
-
-    actual_path_series = close_series.loc[start_time:end_time]
-    ax.plot(actual_path_series.index, actual_path_series.values,
-            linewidth=2, color='#1f77b4', label='Actual Price Action (10:30-16:00)')
-
-
-    ax.plot(predicted_curve_times, predicted_prices,
-            linewidth=2, linestyle='--', color='red', label=path_label)
-
-
-    ax.scatter(plot_data['high_time'], plot_data['high_price'], marker='^', color='green', s=100, zorder=5,
-               label=f'Predicted High: ${plot_data["high_price"]:.2f}')
-    ax.scatter(plot_data['low_time'], plot_data['low_price'], marker='v', color='orange', s=100, zorder=5,
-               label=f'Predicted Low: ${plot_data["low_price"]:.2f}')
-    ax.scatter(end_time, plot_data['end_price'], marker='*', color='purple', s=150, zorder=5,
-               label=f'Predicted Close: ${plot_data["end_price"]:.2f}')
-
-
-    ax.scatter(start_time, plot_data['start_price'], marker='o', color='black', s=80, zorder=5,
-               label=f'10:30 AM Price: ${plot_data["start_price"]:.2f}')
-
-    ax.set_title(f'{ticker_symbol} Daily Price Path Prediction on {date_str}', fontsize=16, fontweight='bold')
-    ax.set_ylabel('Price (USD)', fontsize=12)
-    ax.set_xlabel('Time (ET)', fontsize=12)
-
-    ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-    plt.setp(ax.get_xticklabels(), rotation=0, ha='center', fontsize=10)
-
-    ax.grid(axis='y', linestyle='--', alpha=0.5)
-    ax.legend(loc='upper left', fontsize=10)
-
-
-    ax.set_xlim(start_time, end_time)
-
-    plt.tight_layout()
-    plt.savefig(file_path)
-    plt.close(fig)
-
-
-
 
 
 class DQN(nn.Module):
@@ -290,17 +257,17 @@ class ReplayMemory:
         self.memory = deque([], maxlen=capacity)
 
     def push(self, transition):
+        """Save a transition (s, a, r, s')"""
         self.memory.append(transition)
 
     def sample(self, batch_size):
-        if len(self.memory) < batch_size: return None
+        """Retrieve a random batch of transitions"""
+        if len(self.memory) < batch_size:
+            return None
         return random.sample(self.memory, batch_size)
 
-    def __len__(self): return len(self.memory)
-
-    def __getitem__(self, idx): return self.memory[idx]
-
-    def __setitem__(self, idx, value): self.memory[idx] = value
+    def __len__(self):
+        return len(self.memory)
 
 
 class DQN_Agent:
@@ -312,16 +279,20 @@ class DQN_Agent:
         self.gamma = gamma
         self.target_update_freq = target_update_freq
         self.update_count = 0
+
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
         self.policy_net = DQN(state_size, action_size).to(self.device)
         self.target_net = DQN(state_size, action_size).to(self.device)
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
+
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=learning_rate)
         self.memory = ReplayMemory(memory_size)
         self.criterion = nn.SmoothL1Loss()
 
     def get_action(self, state_vector, epsilon, exploitation_only=False) -> int:
+        """Epsilon-greedy action selection."""
         if not exploitation_only and random.random() < epsilon:
             return random.choice(list(ACTION_MAP.keys()))
         else:
@@ -331,25 +302,38 @@ class DQN_Agent:
             return q_values.argmax().item()
 
     def update_model(self, batch_size):
+        """Perform one step of optimization on the policy network."""
         transitions = self.memory.sample(batch_size)
-        if transitions is None: return 0.0
+        if transitions is None:
+            return 0.0
+
         state_batch, action_batch, reward_batch, next_state_batch, done_batch = zip(*transitions)
+
         state_batch = torch.tensor(np.array(state_batch), dtype=torch.float32).to(self.device)
         action_batch = torch.tensor(np.array(action_batch), dtype=torch.int64).to(self.device).unsqueeze(-1)
         reward_batch = torch.tensor(np.array(reward_batch), dtype=torch.float32).to(self.device)
         next_state_batch = torch.tensor(np.array(next_state_batch), dtype=torch.float32).to(self.device)
         done_batch = torch.tensor(np.array(done_batch, dtype=int), dtype=torch.float32).to(self.device)
+
         state_action_values = self.policy_net(state_batch).gather(1, action_batch).squeeze(-1)
-        next_state_values = self.target_net(next_state_batch).max(1)[0] * (1 - done_batch)
+
+        next_state_values = self.target_net(next_state_batch).max(1)[0]
+        next_state_values = next_state_values * (1 - done_batch)
+
         expected_state_action_values = reward_batch + self.gamma * next_state_values
+
         loss = self.criterion(state_action_values, expected_state_action_values)
+
         self.optimizer.zero_grad()
         loss.backward()
-        for param in self.policy_net.parameters(): param.grad.data.clamp_(-1, 1)
+        for param in self.policy_net.parameters():
+            param.grad.data.clamp_(-1, 1)
         self.optimizer.step()
+
         self.update_count += 1
-        if self.update_count % self.target_update_freq == 0: self.target_net.load_state_dict(
-            self.policy_net.state_dict())
+        if self.update_count % self.target_update_freq == 0:
+            self.target_net.load_state_dict(self.policy_net.state_dict())
+
         return loss.item()
 
     def save_model(self, filename):
@@ -358,19 +342,30 @@ class DQN_Agent:
     def load_model(self, filename):
         self.policy_net.load_state_dict(torch.load(filename, map_location=self.device))
         self.target_net.load_state_dict(self.policy_net.state_dict())
-        self.policy_net.eval();
+        self.policy_net.eval()
         self.target_net.eval()
 
 
 def get_state_vector(df_row: pd.Series, ticker: str, multi_index: bool) -> np.ndarray:
     """Transforms the OHLCV data and indicators into a normalized feature vector."""
-    get_col = lambda name: df_row[(ticker, name)] if multi_index else df_row[name]
+    if multi_index:
+        get_col = lambda name: df_row[(ticker, name)]
+    else:
+        get_col = lambda name: df_row[name]
+
     features = [
-        get_col('Price_Change'), get_col('Close_vs_EMA200'), get_col('EMA8_vs_SMA55'),
-        get_col('MACD'), get_col('Signal_Line'), get_col('MACD_Histogram'), get_col('MACD_vs_Signal'),
-        get_col('SMA_Slope_1m'), get_col('SMA_13') / get_col('Close') - 1.0,
-                                 get_col('SMA_21') / get_col('Close') - 1.0, get_col('SMA_50') / get_col('Close') - 1.0,
-                                 (get_col('High') - get_col('Low')) / get_col('Close'),
+        get_col('Price_Change'),
+        get_col('Close_vs_EMA200'),
+        get_col('EMA8_vs_SMA55'),
+        get_col('MACD'),
+        get_col('Signal_Line'),
+        get_col('MACD_Histogram'),
+        get_col('MACD_vs_Signal'),
+        get_col('SMA_Slope_1m'),
+        get_col('SMA_13') / get_col('Close') - 1.0,
+        get_col('SMA_21') / get_col('Close') - 1.0,
+        get_col('SMA_50') / get_col('Close') - 1.0,
+        (get_col('High') - get_col('Low')) / get_col('Close'),
     ]
     return np.array(features, dtype=np.float32)
 
@@ -378,12 +373,26 @@ def get_state_vector(df_row: pd.Series, ticker: str, multi_index: bool) -> np.nd
 def get_reward(lowest_close, highest_close, action_sequence) -> float:
     perfect_profit = highest_close - lowest_close
     agent_profit = 0.0
-    buys = [p for p, t, a in action_sequence if a == 1]
-    sells = [p for p, t, a in action_sequence if a == 2]
-    if buys and sells: agent_profit = sells[-1] - buys[0]
-    normalized_reward = agent_profit / perfect_profit if perfect_profit > 0 else agent_profit
-    if agent_profit < 0: normalized_reward -= abs(
-        agent_profit / (perfect_profit if perfect_profit > 0.01 else 1.0)) ** 3
+
+    buy_actions = [p for p, t, a in action_sequence if a == 1]
+    sell_actions = [p for p, t, a in action_sequence if a == 2]
+
+    if buy_actions and sell_actions:
+        agent_buy_price = buy_actions[0]
+        agent_sell_price = sell_actions[-1]
+        agent_profit = agent_sell_price - agent_buy_price
+
+    if perfect_profit <= 0:
+        normalized_reward = agent_profit
+    else:
+        normalized_reward = agent_profit / perfect_profit
+
+    if agent_profit < 0:
+        divisor = perfect_profit if perfect_profit > 0.01 else 1.0
+        normalized_loss = abs(agent_profit / divisor)
+        penalty = normalized_loss ** 3
+        normalized_reward = normalized_reward - penalty
+
     return max(-5.0, min(1.0, normalized_reward))
 
 
@@ -449,14 +458,189 @@ def run_validation_episode(df_day: pd.DataFrame, agent: DQN_Agent, ticker: str) 
 
 
 
+def get_portfolio_series(strategy, plot_index):
+
+    if not strategy.portfolio_dates or len(strategy.portfolio_dates) == 1:
+        return pd.Series(strategy.initial_capital, index=plot_index)
+
+    history_df = pd.DataFrame({'Value': strategy.portfolio_value_history}, index=strategy.portfolio_dates)
+    history_df = history_df[~history_df.index.duplicated(keep='last')]
+    history_df.sort_index(inplace=True)
+
+    series = history_df['Value'].reindex(plot_index, method='ffill')
+    return series.fillna(method='ffill')
+
+
+def plot_comparison_results(analysis_df: pd.DataFrame, q_agent_strategy: BaseStrategy, perfect_strategy: BaseStrategy,
+                            ticker_symbol: str, target_day: pd.Timestamp, file_path: str):
+
+    plt.style.use('seaborn-v0_8-whitegrid')
+
+    df_day_slice = analysis_df.loc[
+                   f'{target_day.strftime("%Y-%m-%d")} 09:30:00-05:00':f'{target_day.strftime("%Y-%m-%d")} 15:59:00-05:00'].copy()
+
+    if df_day_slice.columns.nlevels > 1:
+        df_day_slice.columns = df_day_slice.columns.get_level_values(1)
+
+    plot_index = df_day_slice.index
+
+    fig = plt.figure(figsize=(18, 10))
+    gs = gridspec.GridSpec(3, 2, figure=fig, width_ratios=[1, 2], hspace=0.1, wspace=0.15)
+
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax2 = fig.add_subplot(gs[1, 0], sharex=ax1)
+    ax3 = fig.add_subplot(gs[2, 0], sharex=ax1)
+    ax4 = fig.add_subplot(gs[:, 1])
+
+    all_strategies = [q_agent_strategy, perfect_strategy]
+    display_date = target_day.strftime('%Y-%m-%d')
+
+
+    ax1.plot(plot_index, df_day_slice['Close'], linewidth=2, color='#1f77b4', label='Close Price')
+    ax1.plot(plot_index, df_day_slice['EMA_200'], linewidth=1.5, color='#ff7f0e', label='EMA 200')
+    ax1.plot(plot_index, df_day_slice['SMA_55'], linewidth=1.5, color='purple', linestyle='-', alpha=0.7,
+             label='SMA 55')
+    ax1.plot(plot_index, df_day_slice['EMA_8'], linewidth=1.0, color='cyan', linestyle='-', alpha=0.7, label='EMA 8')
+
+    for strategy in all_strategies:
+        is_perfect = (strategy.strategy_name == "Perfect Benchmark")
+        color = 'red' if is_perfect else 'green'
+        marker = '*' if is_perfect else '^'
+        s = 100 if is_perfect else 50
+
+        buy_dates = [date for date in strategy.buy_dates if
+                     pd.notna(date) and date.strftime('%Y-%m-%d') == display_date]
+        sell_dates = [date for date in strategy.sell_dates_signal if
+                      pd.notna(date) and date.strftime('%Y-%m-%d') == display_date]
+
+        if buy_dates:
+            ax1.scatter(buy_dates, df_day_slice.loc[buy_dates]['Close'].values, marker=marker, color=color, s=s,
+                        zorder=5,
+                        label=f'{strategy.strategy_name} Buy')
+
+        if sell_dates:
+            ax1.scatter(sell_dates, df_day_slice.loc[sell_dates]['Close'].values, marker='v', color=color, s=s,
+                        zorder=5,
+                        label=f'{strategy.strategy_name} Sell')
+
+    ax1.set_title(f'{ticker_symbol} Price Action & Trade Signals on {display_date}', fontsize=12, fontweight='bold')
+    ax1.set_ylabel('Price (USD)', fontsize=10)
+    ax1.legend(loc='upper left', fontsize=8, ncol=2)
+    ax1.grid(axis='y', linestyle='--', alpha=0.5)
+    plt.setp(ax1.get_xticklabels(), visible=False)
+
+
+    df_day_slice['MACD'].plot(ax=ax2, linewidth=2, color='#0000FF', label='MACD Line')
+    df_day_slice['Signal_Line'].plot(ax=ax2, linewidth=1.5, color='#FF00FF', label='Signal Line')
+    ax2.axhline(0, color='gray', linestyle='-', linewidth=0.5)
+    ax2.set_ylabel('MACD Value', fontsize=8)
+    ax2.legend(loc='upper right', fontsize=8)
+    ax2.grid(axis='y', linestyle='--', alpha=0.5)
+    plt.setp(ax2.get_xticklabels(), visible=False)
+
+
+    bar_colors = ['green' if x >= 0 else 'red' for x in df_day_slice['MACD_Histogram']]
+    ax3.bar(plot_index, df_day_slice['MACD_Histogram'],
+            width=timedelta(minutes=1) * 0.9,
+            color=bar_colors,
+            label='MACD Histogram')
+
+    ax3.axhline(0, color='gray', linestyle='-', linewidth=0.5)
+    ax3.set_ylabel('Histogram', fontsize=8)
+    ax3.set_xlabel('Time (ET)', fontsize=10)
+    ax3.legend(loc='upper right', fontsize=8)
+    ax3.grid(axis='y', linestyle='--', alpha=0.5)
+
+    ax3.xaxis.set_major_locator(mdates.HourLocator(interval=1))
+    ax3.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    plt.setp(ax3.get_xticklabels(), rotation=0, ha='center', fontsize=9)
+
+
+    q_series = get_portfolio_series(q_agent_strategy, plot_index)
+    q_series.plot(ax=ax4, linewidth=2, color='green', linestyle='-',
+                  label=f'DQN-Agent (Final Value: ${q_series.iloc[-1]:.2f})')
+
+    perfect_series = get_portfolio_series(perfect_strategy, plot_index)
+    perfect_series.plot(ax=ax4, linewidth=3, color='red', linestyle='--',
+                        label=f'Perfect Benchmark (Max Value: ${perfect_series.iloc[-1]:.2f})')
+
+    ax4.axhline(y=INITIAL_CAPITAL, color='black', linestyle=':', linewidth=1.5, alpha=0.7,
+                label=f'Initial Capital (${INITIAL_CAPITAL:.0f})')
+
+    ax4.set_title(f'Portfolio Value Comparison Over Time (One Day)', fontsize=16, fontweight='bold')
+    ax4.set_ylabel('Portfolio Value (USD)', fontsize=12)
+    ax4.set_xlabel('Time (ET)', fontsize=12)
+    ax4.grid(axis='y', linestyle='--', alpha=0.5)
+    ax4.legend(loc='upper left', fontsize=10)
+
+    ax4.xaxis.set_major_locator(mdates.HourLocator(interval=1))
+    ax4.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    plt.setp(ax4.get_xticklabels(), rotation=0, ha='center', fontsize=9)
+    ax4.set_xlim(plot_index.min(), plot_index.max())
+
+    plt.tight_layout()
+    plt.savefig(file_path)
+    plt.close(fig)
+
+
+def plot_accuracy_trend(accuracy_history_df: pd.DataFrame, file_path: str):
+
+    plt.figure(figsize=(12, 6))
+
+    if accuracy_history_df.empty:
+        print("Warning: Accuracy history is empty, skipping accuracy trend plot.")
+        return
+
+    plot_window = 50
+    train_rolling_mean = accuracy_history_df['Training_Accuracy'].rolling(window=plot_window, min_periods=1).mean()
+    val_rolling_mean = accuracy_history_df['Validation_Accuracy'].rolling(window=plot_window, min_periods=1).mean()
+
+    plt.plot(accuracy_history_df.index, train_rolling_mean,
+             linewidth=2, color='blue', label=f'{plot_window}-Episode Rolling Avg (Train)')
+
+    plt.plot(accuracy_history_df.index, val_rolling_mean,
+             linewidth=2, color='red', label=f'{plot_window}-Episode Rolling Avg (Validation)')
+
+    plt.title(f'DQN Agent Accuracy Trend', fontsize=14)
+    plt.xlabel(f'Episode', fontsize=12)
+    plt.ylabel('Accuracy (Normalized [0.0 - 1.0])', fontsize=12)
+    plt.ylim(0, 1.05)
+    plt.grid(True)
+    plt.legend(loc='upper left')
+    plt.tight_layout()
+    plt.savefig(file_path)
+    plt.close()
+
+
+
 def load_model_for_training(save_dir, agent: DQN_Agent):
     model_filename = os.path.join(save_dir, 'weights', f'dqn_policy_net_{TICKER_SYMBOL_TRAINED}.pth')
     acc_filename = os.path.join(save_dir, f'accuracy_history.csv')
+
     accuracy_history = pd.DataFrame(columns=['Episode', 'Training_Accuracy', 'Validation_Accuracy'])
     start_episode = 0
+    if os.path.exists(acc_filename):
+        try:
+            accuracy_history = pd.read_csv(acc_filename, index_col='Episode')
+            accuracy_history.index = accuracy_history.index.astype(int)
+            if not accuracy_history.empty:
+                start_episode = accuracy_history.index.max() + 1
+        except Exception:
+            pass
 
-    epsilon_continue = max(EPSILON_END, EPSILON_START * (EPSILON_DECAY ** start_episode))
-    return epsilon_continue, accuracy_history, start_episode
+    if os.path.exists(model_filename):
+        try:
+            agent.load_model(model_filename)
+            epsilon_continue = max(EPSILON_END, EPSILON_START * (EPSILON_DECAY ** start_episode))
+            return epsilon_continue, accuracy_history, start_episode
+        except Exception:
+            pass
+
+    return EPSILON_START, accuracy_history, start_episode
+
+
+
+
 
 
 def train_single_episode_dqn(
@@ -471,7 +655,20 @@ def train_single_episode_dqn(
 ) -> tuple[DQN_Agent, float, pd.DataFrame]:
     """
     Runs a single DQN training episode, updates the Agent,
-    logs accuracy, and saves assets.
+    logs accuracy, and saves assets. This is the new standalone function.
+
+    Args:
+        agent: The current DQN_Agent instance.
+        epsilon: The current exploration rate.
+        accuracy_history_df: The DataFrame of past accuracy results.
+        current_episode: The number of the episode being run (0-indexed).
+        final_analysis_df: The complete pre-processed data with indicators.
+        all_days: A list of unique trading days in final_analysis_df.
+        ticker: The stock ticker symbol being trained.
+        save_dir: The directory to save the model and plots.
+
+    Returns:
+        A tuple containing (updated_DQN_Agent, next_epsilon, updated_accuracy_history_df).
     """
 
     episode = current_episode
@@ -530,7 +727,9 @@ def train_single_episode_dqn(
             current_state_vector = next_state_vector
             first_state_action = action
 
+
         if i > 0:
+
             agent.memory.push((current_state_vector, action, 0.0, next_state_vector, False))
 
 
@@ -568,14 +767,20 @@ def train_single_episode_dqn(
 
 
 
-    for i in range(min(len(df_day) - 1, len(agent.memory))):
-        idx_in_memory = len(agent.memory) - 1 - i
-        s, a, r_old, s_prime, done_old = agent.memory[idx_in_memory]
 
-        new_done = True if i == 0 else False
-        new_reward = episode_reward
+    if len(agent.memory) > 0:
 
-        agent.memory[idx_in_memory] = (s, a, new_reward, s_prime, new_done)
+        for i in range(len(df_day) - 1):
+            if len(agent.memory) - 1 - i >= 0:
+                idx_in_memory = len(agent.memory) - 1 - i
+
+
+                s, a, r_old, s_prime, done_old = agent.memory[idx_in_memory]
+
+                new_done = True if i == 0 else False
+                new_reward = episode_reward
+
+                agent.memory[idx_in_memory] = (s, a, new_reward, s_prime, new_done)
 
 
     if len(agent.memory) >= BATCH_SIZE:
@@ -598,6 +803,7 @@ def train_single_episode_dqn(
 
     validation_accuracy = 0.0
     if episode + 1 >= ACCURACY_START_EPISODE:
+
         available_val_days = [d for d in all_days if d != random_day_timestamp]
         validation_day = random.choice(available_val_days) if available_val_days else random_day_timestamp
 
@@ -623,13 +829,13 @@ def train_single_episode_dqn(
     agent.save_model(MODEL_FILENAME)
     accuracy_history_df.to_csv(ACC_FILENAME)
 
+
     current_day_df = df_day.copy()
     target_day = current_day_df.index.normalize().min()
 
-
     os.makedirs(os.path.join(save_dir, 'screenshots'), exist_ok=True)
     PL_FILENAME = os.path.join(save_dir,
-                                   f'screenshots\\Episode {episode + 1:05d}.png')
+                               f'screenshots\\{target_day.strftime("%Y%m%d")}_PNL_Eps{episode + 1:05d}.png')
 
     q_agent_strategy = BaseStrategy("DQN-Agent")
     perfect_strategy = BaseStrategy("Perfect Benchmark")
@@ -638,15 +844,14 @@ def train_single_episode_dqn(
     q_agent_strategy.record_trade(current_day_df, action_sequence)
     perfect_strategy.record_trade(current_day_df, current_perfect_actions, perfect_trade_mode=True)
 
-    if not episode % 100:
-        plot_comparison_results(
-            analysis_df=final_analysis_df.copy(),
-            q_agent_strategy=q_agent_strategy,
-            perfect_strategy=perfect_strategy,
-            ticker_symbol=ticker,
-            target_day=target_day,
-            file_path=PL_FILENAME
-        )
+    plot_comparison_results(
+        analysis_df=final_analysis_df.copy(),
+        q_agent_strategy=q_agent_strategy,
+        perfect_strategy=perfect_strategy,
+        ticker_symbol=ticker,
+        target_day=target_day,
+        file_path=PL_FILENAME
+    )
 
     plot_accuracy_trend(accuracy_history_df, ACC_PLOT_FILENAME)
 
@@ -655,7 +860,7 @@ def train_single_episode_dqn(
 
     print("-" * 100)
     print(
-        f"| EPISODE {episode + 1} COMPLETE | \u03B5 (next): {next_epsilon:.8f} | Train Acc: {train_accuracy:.4f} | Val Acc: {validation_accuracy:.4f}")
+        f"| DEEP LEARNING EPISODE {episode + 1} COMPLETE | \u03B5 (next): {next_epsilon:.8f} | Train Acc: {train_accuracy:.4f} | Val Acc: {validation_accuracy:.4f}")
     print("-" * 100)
 
 
@@ -666,298 +871,50 @@ def train_single_episode_dqn(
 
 
 
-
-
-class StockLSTM_V2(nn.Module):
-    def __init__(self, input_dim, hidden_dim, num_layers, output_classes=2, output_regs=4):
-        super(StockLSTM_V2, self).__init__()
-        self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
-        self.fc_cls = nn.Linear(hidden_dim, output_classes)
-        self.fc_reg = nn.Linear(hidden_dim, output_regs)
-
-    def forward(self, x):
-        _, (hn, _) = self.lstm(x)
-        final_state = hn[-1]
-        return self.fc_cls(final_state), self.fc_reg(final_state)
-
-
-
-
-
-def load_lstm_model_state(save_dir, ticker):
-    model_filename = os.path.join(save_dir, 'weights', f'lstm_predictor_{ticker}.pth')
-    start_episode = 0
-
-    return {}, start_episode
-
-
-def save_lstm_model_state(model, save_dir, ticker, episode):
-    model_filename = os.path.join(save_dir, 'weights', f'lstm_predictor_{ticker}.pth')
-    torch.save(model.state_dict(), model_filename)
-
-
-def train_lstm_model(model, X_train, Y_cls_train, Y_reg_train, epochs=1, learning_rate=LSTM_LEARNING_RATE):
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    cls_criterion = nn.CrossEntropyLoss()
-    reg_criterion = nn.MSELoss()
-    dataset = torch.utils.data.TensorDataset(X_train, Y_cls_train, Y_reg_train)
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
-    model.train()
-    total_loss = 0.0
-
-    for batch_x, batch_y_cls, batch_y_reg in dataloader:
-        optimizer.zero_grad()
-        cls_pred, reg_pred = model(batch_x)
-        loss = cls_criterion(cls_pred, batch_y_cls) + reg_criterion(reg_pred, batch_y_reg)
-        loss.backward()
-        optimizer.step()
-        total_loss += loss.item()
-
-    return model, total_loss / len(dataloader)
-
-
-def train_single_episode_lstm(model, X_data, Y_cls_data, Y_reg_data, current_episode, config):
-
-    updated_model, avg_loss = train_lstm_model(
-        model, X_data, Y_cls_data, Y_reg_data, epochs=1, learning_rate=LSTM_LEARNING_RATE
-    )
-    save_lstm_model_state(updated_model, config['save_dir'], config['ticker'], current_episode + 1)
-    print(f"| EP {current_episode + 1:<5} | Loss {avg_loss:.6f} | Type LSTM | Model {config['name']} | Epoch Complete.")
-    return updated_model, avg_loss
-
-
-
-
-
-
-
-
-
-
-def filter_easy_days(
-        all_days: list,
-        df: pd.DataFrame,
-        ticker: str,
-        skip_percentage: float = 0.75
-) -> list:
-    """
-    Analyzes each day's price path to determine the overall trend (upward/downward).
-    Downward trends (Highest point earlier than Lowest point) are kept.
-    Upward/Sideways trends are skipped with a probability of `skip_percentage`.
-    """
-    print(f"Applying downward trend preference filter (Skip Easy Days: {skip_percentage * 100:.0f}%)")
-
-
-    close_col_name = (ticker, 'Close')
-    if close_col_name not in df.columns:
-        print(f"Warning: Close column not found for ticker {ticker}. Skipping trend analysis.")
-        return all_days
-
-    filtered_days = []
-
-
-    for day_timestamp in all_days:
-        date_str = day_timestamp.strftime('%Y-%m-%d')
-        df_day = df.loc[date_str].copy()
-
-        if df_day.empty:
-            continue
-
-        day_prices = df_day[close_col_name]
-
-
-        high_price = day_prices.max()
-        low_price = day_prices.min()
-
-
-
-        high_time = day_prices[day_prices == high_price].index.min()
-        low_time = day_prices[day_prices == low_price].index.min()
-
-
-
-        is_downward_trend = (high_time < low_time)
-
-
-        if is_downward_trend:
-
-
-
-
-
-
-
-            filtered_days.append(day_timestamp)
-        else:
-
-            if random.random() >= skip_percentage:
-                filtered_days.append(day_timestamp)
-
-    print(f"Original days: {len(all_days)}, Filtered days (available for selection): {len(filtered_days)}")
-    return filtered_days
-
-
-
-
-
-
-def run_multi_model_training_session(
-        model_configs: list,
-        training_data_df: pd.DataFrame,
-        all_training_days: list,
-):
-    """
-    Runs SESSION_EPISODES training steps for Q-Learning, DQN, and LSTM models,
-    with a preference for downward-trending days.
-    """
-
-
-
-    X_lstm, Y_cls_lstm, Y_reg_lstm, num_features, Y_reg_mean, Y_reg_std, train_mean, train_std = prepare_lstm_data_v2(
-        training_data_df, TICKER_SYMBOL_TRAINED
-    )
-    global LSTM_INPUT_FEATURES
-    LSTM_INPUT_FEATURES = num_features
-
-
-
-    filtered_training_days = filter_easy_days(
-        all_training_days,
-        training_data_df,
-        TICKER_SYMBOL_TRAINED,
-        skip_percentage=0.75
-    )
-    if not filtered_training_days:
-        print("ERROR: Filtered list of days is empty. Training cannot continue.")
-        return
-
-
-
-
-    model_states = {}
-    print(f"--- Initializing and Loading {len(model_configs)} Agents ---")
-
-    for config in model_configs:
-        model_name = config['name']
-        save_dir = config['save_dir']
-        os.makedirs(os.path.join(save_dir, 'weights'), exist_ok=True)
-
-        if config['type'] == 'QL':
-            q_table, epsilon, history_df, start_episode = load_q_table_for_training(save_dir, config['ticker'], {})
-            model_states[model_name] = {'type': 'QL', 'q_table': q_table, 'epsilon': epsilon, 'history_df': history_df,
-                                        'current_episode': start_episode, 'config': config}
-            print(f"✅ Loaded QL Model ({model_name}): Start Ep {start_episode + 1}, Epsilon {epsilon:.6f}")
-
-        elif config['type'] == 'DQN':
-            agent = DQN_Agent(state_size=STATE_SIZE, action_size=NUM_ACTIONS, learning_rate=LEARNING_RATE, gamma=GAMMA,
-                              memory_size=REPLAY_MEMORY_SIZE, target_update_freq=TARGET_UPDATE_FREQ)
-            epsilon, history_df, start_episode = load_model_for_training(save_dir, agent)
-            model_states[model_name] = {'type': 'DQN', 'agent': agent, 'epsilon': epsilon, 'history_df': history_df,
-                                        'current_episode': start_episode, 'config': config}
-            print(f"✅ Loaded DQN Model ({model_name}): Start Ep {start_episode + 1}, Epsilon {epsilon:.6f}")
-
-        elif config['type'] == 'LSTM':
-            lstm_model = StockLSTM_V2(input_dim=LSTM_INPUT_FEATURES, hidden_dim=LSTM_HIDDEN_DIM,
-                                      num_layers=LSTM_NUM_LAYERS)
-            loaded_data, start_episode = load_lstm_model_state(save_dir, config['ticker'])
-            model_states[model_name] = {
-                'type': 'LSTM', 'model': lstm_model, 'X_data': X_lstm, 'Y_cls_data': Y_cls_lstm,
-                'Y_reg_data': Y_reg_lstm, 'current_episode': start_episode, 'config': config
-            }
-            print(f"✅ Initialized LSTM Model ({model_name}): Start Ep {start_episode + 1}, Epochs {start_episode}")
-
-    print("-" * 50)
-
-
-    for session_episode in range(SESSION_EPISODES):
-        if not (session_episode + 1) % 100:
-            print(f"\n--- SESSION EPISODE {session_episode + 1}/{SESSION_EPISODES} ---")
-
-        for name, state in model_states.items():
-            config = state['config']
-
-
-            days_to_use = all_training_days if config['type'] == 'LSTM' else filtered_training_days
-
-
-            if config['type'] == 'QL':
-                updated_q_table, next_epsilon, updated_history_df = train_single_episode(
-                    q_table=state['q_table'], epsilon=state['epsilon'], accuracy_history_df=state['history_df'],
-                    current_episode=state['current_episode'], final_analysis_df=training_data_df,
-                    all_days=days_to_use,
-                    ticker=config['ticker'], save_dir=config['save_dir']
-                )
-                state['q_table'] = updated_q_table
-                state['epsilon'] = next_epsilon
-                state['history_df'] = updated_history_df
-
-            elif config['type'] == 'DQN':
-                updated_agent, next_epsilon, updated_history_df = train_single_episode_dqn(
-                    agent=state['agent'], epsilon=state['epsilon'], accuracy_history_df=state['history_df'],
-                    current_episode=state['current_episode'], final_analysis_df=training_data_df,
-                    all_days=days_to_use,
-                    ticker=config['ticker'], save_dir=config['save_dir']
-                )
-
-                state['agent'] = updated_agent
-                state['epsilon'] = next_epsilon
-                state['history_df'] = updated_history_df
-
-            elif config['type'] == 'LSTM':
-
-                updated_model, loss = train_single_episode_lstm(
-                    model=state['model'], X_data=state['X_data'], Y_cls_data=state['Y_cls_data'],
-                    Y_reg_data=state['Y_reg_data'], current_episode=state['current_episode'], config=config
-                )
-                state['model'] = updated_model
-
-            state['current_episode'] += 1
-
-        if not (session_episode + 1) % 100:
-            stock_tickers = ["AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "V", "MA", "LLY"]
-            amazingprogram(choice(stock_tickers), plot=False)
-
-    print(f"\n=================================================")
-    print(f"Training Session Complete: Ran {SESSION_EPISODES} steps per model.")
-    print(f"=================================================")
-
-
-
-
-
 if __name__ == '__main__':
 
 
-    for config in MODEL_CONFIGS:
-        os.makedirs(os.path.join(config['save_dir'], 'weights'), exist_ok=True)
 
 
-    print("\n--- PHASE 0: Data Setup ---")
 
+
+
+
+    print("\n[DEMO MODE] Initializing DQN agent with dummy data...")
     try:
-
-        data = get_multi_year(list(range(2010, 2018)), 'SPXUSD', provider='histdata')
+        data = get_multi_year(list(range(2010, 2018)), TICKER_SYMBOL_TRAINED, provider='histdata')
         data.columns = [col.lower() for col in data.columns]
-        data_reformatted = reformat_local_data(data.copy(), ticker='SPY')
-        final_analysis_df = add_indicators_to_local_data(data_reformatted.copy(), ticker='SPY')
+        data_reformatted = reformat_local_data(data.copy(), ticker=TICKER_SYMBOL_TRAINED)
+        final_analysis_df = add_indicators_to_local_data(data_reformatted.copy(), ticker=TICKER_SYMBOL_TRAINED)
         all_days = final_analysis_df.index.normalize().unique().tolist()
-
-
-
-        if final_analysis_df.empty or len(all_days) < 2:
-            raise ValueError("Data frame is empty or has insufficient days.")
-
-    except Exception as e:
-        print(f"FATAL: Data loading error (Check 'pyfinancialdata' and internet connection): {e}")
+    except:
+        print("FATAL: Cannot run demo without internet/yfinance data.")
         exit()
 
-    print(f"✅ Data prepared for {TICKER_SYMBOL_TRAINED}: {len(all_days)} trading days available.")
 
-
-    print("\n--- PHASE 1: Running Continuous Multi-Model Training Session ---")
-
-    run_multi_model_training_session(
-        model_configs=MODEL_CONFIGS,
-        training_data_df=final_analysis_df,
-        all_training_days=all_days,
+    dqn_agent = DQN_Agent(
+        state_size=STATE_SIZE,
+        action_size=NUM_ACTIONS,
+        learning_rate=LEARNING_RATE,
+        gamma=GAMMA,
+        memory_size=REPLAY_MEMORY_SIZE,
+        target_update_freq=TARGET_UPDATE_FREQ
     )
+
+
+    epsilon, accuracy_history_df, start_episode = load_model_for_training(SAVE_DIR, dqn_agent)
+
+
+    new_agent, new_epsilon, new_history = train_single_episode_dqn(
+        dqn_agent,
+        epsilon,
+        accuracy_history_df,
+        start_episode,
+        final_analysis_df,
+        all_days,
+        TICKER_SYMBOL_TRAINED,
+        SAVE_DIR
+    )
+
+    print("\n--- DEMO END ---")
+    print("To continue training from an external file, pass the three returned variables back into the function.")
