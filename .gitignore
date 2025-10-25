@@ -8,3 +8,9 @@
 poop.py
 /__pycache__
 poop.py
+/gru_results/screenshots
+/lstm_results_v2/screenshots
+/ppo_results/screenshots
+binaners.py
+dqn_results/Accuracy_Trend.png
+supervised_results/RF_SPY.joblib

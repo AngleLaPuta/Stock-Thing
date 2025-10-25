@@ -1,273 +1,701 @@
 Strategy Name,Return%
-Perfect Foresight (Max Return Long Benchmark),0.9645%
-Perfect Foresight (Max Return Short Benchmark),0.7234%
-SMA Crossover (100% Cash),0.4570%
-Random Trader (1% Chance),0.2918%
-Swing Low Support (15m),0.1716%
-EMA Crossover (100% Cash),0.1296%
-All-In-One Hybrid (1/5th Split),0.0785%
-Q-Agent (SPY),0.0583%
-Random Trader (12% Hourly),0.0073%
+Perfect Foresight (Max Return Long Benchmark),1.0077%
+Perfect Foresight (Max Return Short Benchmark),0.8503%
+Random Trader (1% Chance),0.3122%
+PPO-Agent (SPY),0.0754%
+Swing Low Support (15m),0.0522%
 LSTM-Prediction Agent (SPY),0.0000%
-MACD Crossover (100% Cash),0.0000%
-MACD Crossover (100% Cash),-0.0315%
-SMA Derivative Trade,-0.0401%
-Triple SMA (13/21/55) + 8 EMA Crossover,-0.0498%
-MACD Histo Derivative (100% Cash),-0.1226%
-DQN-Agent (SPY),-0.3946%
-Perfect Foresight (Max Return Long Benchmark),1.5151%
-Perfect Foresight (Max Return Short Benchmark),0.8573%
-Triple SMA (13/21/55) + 8 EMA Crossover,0.7797%
-LSTM-Prediction Agent (SPY),0.7187%
-SMA Derivative Trade,0.5687%
-Q-Agent (SPY),0.3524%
-SMA Crossover (100% Cash),0.2558%
-All-In-One Hybrid (1/5th Split),0.1589%
-MACD Crossover (100% Cash),0.1468%
-MACD Crossover (100% Cash),0.0383%
-MACD Histo Derivative (100% Cash),0.0196%
-Random Trader (12% Hourly),0.0172%
-DQN-Agent (SPY),-0.0658%
-EMA Crossover (100% Cash),-0.0880%
-Swing Low Support (15m),-0.4205%
-Random Trader (1% Chance),-0.4943%
-Perfect Foresight (Max Return Short Benchmark),3.2398%
-Perfect Foresight (Max Return Long Benchmark),3.1991%
-MACD Histo Derivative (100% Cash),0.5392%
-Q-Agent (SPY),0.1030%
-All-In-One Hybrid (1/5th Split),0.0600%
-MACD Crossover (100% Cash),0.0476%
-Swing Low Support (15m),0.0240%
-SMA Derivative Trade,0.0000%
-SMA Crossover (100% Cash),-0.0472%
-DQN-Agent (SPY),-0.0970%
-MACD Crossover (100% Cash),-0.1072%
-Random Trader (12% Hourly),-0.1249%
-EMA Crossover (100% Cash),-0.2398%
-Random Trader (1% Chance),-0.4571%
-LSTM-Prediction Agent (SPY),-0.6473%
-Triple SMA (13/21/55) + 8 EMA Crossover,-0.6774%
-Perfect Foresight (Max Return Long Benchmark),0.9645%
-Perfect Foresight (Max Return Short Benchmark),0.7234%
-SMA Crossover (100% Cash),0.4570%
-Swing Low Support (15m),0.1716%
-EMA Crossover (100% Cash),0.1296%
-All-In-One Hybrid (1/5th Split),0.0785%
-Random Trader (12% Hourly),0.0492%
-Random Trader (1% Chance),0.0332%
-DQN-Agent (SPY),0.0000%
-LSTM-Prediction Agent (SPY),0.0000%
-MACD Crossover (100% Cash),0.0000%
-MACD Crossover (100% Cash),-0.0315%
-SMA Derivative Trade,-0.0401%
-Q-Agent (SPY),-0.0419%
-Triple SMA (13/21/55) + 8 EMA Crossover,-0.0498%
-MACD Histo Derivative (100% Cash),-0.1226%
-Perfect Foresight (Max Return Short Benchmark),1.6277%
-Perfect Foresight (Max Return Long Benchmark),1.1561%
-Q-Agent (SPY),0.2819%
-MACD Crossover (100% Cash),0.1340%
-Triple SMA (13/21/55) + 8 EMA Crossover,0.0879%
-Random Trader (12% Hourly),0.0026%
-DQN-Agent (SPY),0.0000%
-LSTM-Prediction Agent (SPY),0.0000%
-EMA Crossover (100% Cash),-0.0062%
-SMA Derivative Trade,-0.0087%
-MACD Crossover (100% Cash),-0.0248%
-All-In-One Hybrid (1/5th Split),-0.0914%
-SMA Crossover (100% Cash),-0.1090%
-MACD Histo Derivative (100% Cash),-0.3083%
-Swing Low Support (15m),-0.3523%
-Random Trader (1% Chance),-0.4189%
-Perfect Foresight (Max Return Short Benchmark),0.7333%
-Perfect Foresight (Max Return Long Benchmark),0.6605%
-Random Trader (1% Chance),0.0247%
-Triple SMA (13/21/55) + 8 EMA Crossover,0.0209%
-Random Trader (12% Hourly),0.0073%
-LSTM-Prediction Agent (SPY),0.0000%
-MACD Crossover (100% Cash),-0.0470%
-Q-Agent (SPY),-0.0962%
-SMA Derivative Trade,-0.1285%
-MACD Histo Derivative (100% Cash),-0.1747%
-All-In-One Hybrid (1/5th Split),-0.2191%
-DQN-Agent (SPY),-0.2211%
-MACD Crossover (100% Cash),-0.2211%
-SMA Crossover (100% Cash),-0.2763%
-EMA Crossover (100% Cash),-0.2948%
-Swing Low Support (15m),-0.5148%
-Perfect Foresight (Max Return Long Benchmark),1.2497%
-Perfect Foresight (Max Return Short Benchmark),0.9252%
-Swing Low Support (15m),0.4797%
-Triple SMA (13/21/55) + 8 EMA Crossover,0.3302%
-Q-Agent (SPY),0.3123%
-EMA Crossover (100% Cash),0.2399%
-SMA Crossover (100% Cash),0.1597%
-Random Trader (1% Chance),0.0630%
-Random Trader (12% Hourly),0.0462%
-SMA Derivative Trade,0.0448%
-All-In-One Hybrid (1/5th Split),0.0300%
-DQN-Agent (SPY),0.0000%
-MACD Crossover (100% Cash),-0.0609%
-LSTM-Prediction Agent (SPY),-0.0789%
-MACD Crossover (100% Cash),-0.0954%
-MACD Histo Derivative (100% Cash),-0.1992%
-Perfect Foresight (Max Return Long Benchmark),0.9645%
-Perfect Foresight (Max Return Short Benchmark),0.7234%
-SMA Crossover (100% Cash),0.4570%
-Swing Low Support (15m),0.1716%
-EMA Crossover (100% Cash),0.1296%
-Random Trader (12% Hourly),0.0928%
-All-In-One Hybrid (1/5th Split),0.0785%
-Q-Agent (SPY),0.0064%
-DQN-Agent (SPY),0.0000%
-LSTM-Prediction Agent (SPY),0.0000%
-MACD Crossover (100% Cash),0.0000%
-MACD Crossover (100% Cash),-0.0315%
-SMA Derivative Trade,-0.0401%
-Triple SMA (13/21/55) + 8 EMA Crossover,-0.0498%
-Random Trader (1% Chance),-0.0675%
-MACD Histo Derivative (100% Cash),-0.1226%
-Perfect Foresight (Max Return Long Benchmark),0.7682%
-Perfect Foresight (Max Return Short Benchmark),0.6711%
-Random Trader (1% Chance),0.3650%
-MACD Crossover (100% Cash),0.0751%
-MACD Crossover (100% Cash),0.0655%
-DQN-Agent (SPY),0.0000%
-LSTM-Prediction Agent (SPY),0.0000%
-Random Trader (12% Hourly),-0.0056%
-SMA Crossover (100% Cash),-0.0092%
-Swing Low Support (15m),-0.0247%
-SMA Derivative Trade,-0.0321%
-All-In-One Hybrid (1/5th Split),-0.0721%
-EMA Crossover (100% Cash),-0.1248%
-Q-Agent (SPY),-0.1291%
-Triple SMA (13/21/55) + 8 EMA Crossover,-0.1404%
-MACD Histo Derivative (100% Cash),-0.2597%
-Perfect Foresight (Max Return Long Benchmark),0.9645%
-Perfect Foresight (Max Return Short Benchmark),0.7234%
-SMA Crossover (100% Cash),0.4570%
-Swing Low Support (15m),0.1716%
-EMA Crossover (100% Cash),0.1296%
-All-In-One Hybrid (1/5th Split),0.0785%
-Q-Agent (SPY),0.0064%
-LSTM-Prediction Agent (SPY),0.0000%
-MACD Crossover (100% Cash),0.0000%
-Random Trader (12% Hourly),-0.0039%
-DQN-Agent (SPY),-0.0315%
-MACD Crossover (100% Cash),-0.0315%
-Random Trader (1% Chance),-0.0349%
-SMA Derivative Trade,-0.0401%
-Triple SMA (13/21/55) + 8 EMA Crossover,-0.0498%
-MACD Histo Derivative (100% Cash),-0.1226%
-Perfect Foresight (Max Return Long Benchmark),1.2497%
-Perfect Foresight (Max Return Short Benchmark),0.9252%
-Swing Low Support (15m),0.4797%
-Random Trader (1% Chance),0.4376%
-Triple SMA (13/21/55) + 8 EMA Crossover,0.3302%
-EMA Crossover (100% Cash),0.2399%
-SMA Crossover (100% Cash),0.1597%
-SMA Derivative Trade,0.0448%
-All-In-One Hybrid (1/5th Split),0.0300%
-LSTM-Prediction Agent (SPY),0.0000%
-Random Trader (12% Hourly),-0.0141%
-DQN-Agent (SPY),-0.0542%
-MACD Crossover (100% Cash),-0.0609%
-MACD Crossover (100% Cash),-0.0954%
-MACD Histo Derivative (100% Cash),-0.1992%
-Q-Agent (SPY),-0.2865%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+Random Trader (12% Hourly),-0.0032%
+MACD Crossover (100% Cash),-0.0058%
+Q-Agent (SPY),-0.0232%
+MACD Crossover (100% Cash),-0.0290%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.0540%
+SMA Derivative Trade,-0.0580%
+All-In-One Hybrid (1/5th Split),-0.0826%
+EMA Crossover (100% Cash),-0.0985%
+SMA Crossover (100% Cash),-0.0985%
+GRU-Prediction Agent (SPY),-0.1253%
+MACD Histo Derivative (100% Cash),-0.1286%
+DQN-Agent (SPY),-0.1560%
+Perfect Foresight (Max Return Long Benchmark),0.4066%
+Perfect Foresight (Max Return Short Benchmark),0.3076%
+Random Trader (1% Chance),0.2774%
+LSTM-Prediction Agent (SPY),0.1506%
+PPO-Agent (SPY),0.1462%
+DQN-Agent (SPY),0.1447%
+MACD Crossover (100% Cash),0.1296%
+Q-Agent (SPY),0.0395%
+Random Trader (12% Hourly),0.0209%
+All-In-One Hybrid (1/5th Split),0.0167%
+MACD Histo Derivative (100% Cash),0.0104%
+SMA Crossover (100% Cash),0.0015%
+EMA Crossover (100% Cash),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+Swing Low Support (15m),-0.0387%
+SMA Derivative Trade,-0.0581%
+MACD Crossover (100% Cash),-0.0797%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.1028%
 Perfect Foresight (Max Return Long Benchmark),1.5236%
 Perfect Foresight (Max Return Short Benchmark),1.4707%
+DQN-Agent (SPY),1.0050%
+Q-Agent (SPY),0.7968%
+PPO-Agent (SPY),0.5018%
 MACD Histo Derivative (100% Cash),0.1843%
-Q-Agent (SPY),0.1498%
-Random Trader (12% Hourly),0.0497%
+Random Trader (1% Chance),0.1079%
 MACD Crossover (100% Cash),0.0317%
-DQN-Agent (SPY),0.0000%
+Random Trader (12% Hourly),0.0145%
 LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
 SMA Crossover (100% Cash),-0.0087%
 All-In-One Hybrid (1/5th Split),-0.0629%
 SMA Derivative Trade,-0.1175%
 EMA Crossover (100% Cash),-0.1438%
 MACD Crossover (100% Cash),-0.2290%
-Random Trader (1% Chance),-0.2703%
 Swing Low Support (15m),-0.3374%
 Triple SMA (13/21/55) + 8 EMA Crossover,-0.4309%
+Perfect Foresight (Max Return Long Benchmark),1.5151%
+Perfect Foresight (Max Return Short Benchmark),0.8573%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.7797%
+GRU-Prediction Agent (SPY),0.7187%
+SMA Derivative Trade,0.5687%
+DQN-Agent (SPY),0.4026%
+SMA Crossover (100% Cash),0.2558%
+PPO-Agent (SPY),0.1687%
+All-In-One Hybrid (1/5th Split),0.1589%
+MACD Crossover (100% Cash),0.1468%
+MACD Crossover (100% Cash),0.0383%
+Random Trader (12% Hourly),0.0354%
+MACD Histo Derivative (100% Cash),0.0196%
+LSTM-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+Q-Agent (SPY),-0.0332%
+EMA Crossover (100% Cash),-0.0880%
+Random Trader (1% Chance),-0.1053%
+Swing Low Support (15m),-0.4205%
+Perfect Foresight (Max Return Long Benchmark),0.8436%
+Perfect Foresight (Max Return Short Benchmark),0.7739%
+Q-Agent (SPY),0.4858%
+SMA Crossover (100% Cash),0.4843%
+DQN-Agent (SPY),0.2724%
+EMA Crossover (100% Cash),0.1814%
+All-In-One Hybrid (1/5th Split),0.1047%
+PPO-Agent (SPY),0.0951%
+Swing Low Support (15m),0.0951%
+MACD Crossover (100% Cash),0.0130%
+Random Trader (1% Chance),0.0101%
+MACD Crossover (100% Cash),0.0072%
+LSTM-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+Random Trader (12% Hourly),-0.0147%
+SMA Derivative Trade,-0.0688%
+MACD Histo Derivative (100% Cash),-0.0804%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.1033%
+GRU-Prediction Agent (SPY),-0.1208%
+Perfect Foresight (Max Return Short Benchmark),3.2398%
+Perfect Foresight (Max Return Long Benchmark),3.1991%
+MACD Histo Derivative (100% Cash),0.5392%
+Random Trader (12% Hourly),0.1477%
+All-In-One Hybrid (1/5th Split),0.0600%
+MACD Crossover (100% Cash),0.0476%
+Swing Low Support (15m),0.0240%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+SMA Derivative Trade,0.0000%
+SMA Crossover (100% Cash),-0.0472%
+MACD Crossover (100% Cash),-0.1072%
+EMA Crossover (100% Cash),-0.2398%
+LSTM-Prediction Agent (SPY),-0.6473%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.6774%
+Q-Agent (SPY),-0.6887%
+DQN-Agent (SPY),-0.8304%
+PPO-Agent (SPY),-0.8304%
+Random Trader (1% Chance),-1.0305%
+Perfect Foresight (Max Return Long Benchmark),0.8436%
+Perfect Foresight (Max Return Short Benchmark),0.7739%
+Q-Agent (SPY),0.4843%
+SMA Crossover (100% Cash),0.4843%
+EMA Crossover (100% Cash),0.1814%
+All-In-One Hybrid (1/5th Split),0.1047%
+PPO-Agent (SPY),0.0951%
+Swing Low Support (15m),0.0951%
+MACD Crossover (100% Cash),0.0130%
+MACD Crossover (100% Cash),0.0072%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+Random Trader (12% Hourly),0.0000%
+Random Trader (1% Chance),-0.0631%
+DQN-Agent (SPY),-0.0631%
+SMA Derivative Trade,-0.0688%
+MACD Histo Derivative (100% Cash),-0.0804%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.1033%
+Perfect Foresight (Max Return Long Benchmark),1.5151%
+Perfect Foresight (Max Return Short Benchmark),0.8573%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.7797%
+GRU-Prediction Agent (SPY),0.7187%
+SMA Derivative Trade,0.5687%
+SMA Crossover (100% Cash),0.2558%
+PPO-Agent (SPY),0.1687%
+Random Trader (1% Chance),0.1598%
+All-In-One Hybrid (1/5th Split),0.1589%
+MACD Crossover (100% Cash),0.1468%
+MACD Crossover (100% Cash),0.0383%
+Random Trader (12% Hourly),0.0282%
+MACD Histo Derivative (100% Cash),0.0196%
+LSTM-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+EMA Crossover (100% Cash),-0.0880%
+Q-Agent (SPY),-0.2046%
+DQN-Agent (SPY),-0.3015%
+Swing Low Support (15m),-0.4205%
+Perfect Foresight (Max Return Short Benchmark),3.2398%
+Perfect Foresight (Max Return Long Benchmark),3.1991%
+Random Trader (1% Chance),2.0511%
+MACD Histo Derivative (100% Cash),0.5392%
+All-In-One Hybrid (1/5th Split),0.0600%
+MACD Crossover (100% Cash),0.0476%
+Swing Low Support (15m),0.0240%
+Random Trader (12% Hourly),0.0010%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+SMA Derivative Trade,0.0000%
+SMA Crossover (100% Cash),-0.0472%
+MACD Crossover (100% Cash),-0.1072%
+EMA Crossover (100% Cash),-0.2398%
+DQN-Agent (SPY),-0.2913%
+LSTM-Prediction Agent (SPY),-0.6473%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.6774%
+PPO-Agent (SPY),-0.8304%
+Q-Agent (SPY),-0.9051%
+Perfect Foresight (Max Return Long Benchmark),1.5236%
+Perfect Foresight (Max Return Short Benchmark),1.4707%
+Q-Agent (SPY),0.7855%
+PPO-Agent (SPY),0.5018%
+DQN-Agent (SPY),0.3367%
+MACD Histo Derivative (100% Cash),0.1843%
+Random Trader (12% Hourly),0.0633%
+MACD Crossover (100% Cash),0.0317%
+Random Trader (1% Chance),0.0142%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+SMA Crossover (100% Cash),-0.0087%
+All-In-One Hybrid (1/5th Split),-0.0629%
+SMA Derivative Trade,-0.1175%
+EMA Crossover (100% Cash),-0.1438%
+MACD Crossover (100% Cash),-0.2290%
+Swing Low Support (15m),-0.3374%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.4309%
+Perfect Foresight (Max Return Short Benchmark),1.6277%
+Perfect Foresight (Max Return Long Benchmark),1.1561%
+DQN-Agent (SPY),0.3198%
+MACD Crossover (100% Cash),0.1340%
+Random Trader (12% Hourly),0.0914%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.0879%
+Q-Agent (SPY),0.0576%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+EMA Crossover (100% Cash),-0.0062%
+SMA Derivative Trade,-0.0087%
+MACD Crossover (100% Cash),-0.0248%
+PPO-Agent (SPY),-0.0757%
+All-In-One Hybrid (1/5th Split),-0.0914%
+SMA Crossover (100% Cash),-0.1090%
+Random Trader (1% Chance),-0.1197%
+MACD Histo Derivative (100% Cash),-0.3083%
+Swing Low Support (15m),-0.3523%
+Perfect Foresight (Max Return Long Benchmark),0.9645%
+Perfect Foresight (Max Return Short Benchmark),0.7234%
+SMA Crossover (100% Cash),0.4570%
+DQN-Agent (SPY),0.2998%
+PPO-Agent (SPY),0.1716%
+Swing Low Support (15m),0.1716%
+EMA Crossover (100% Cash),0.1296%
+All-In-One Hybrid (1/5th Split),0.0785%
+Random Trader (1% Chance),0.0245%
+Q-Agent (SPY),0.0064%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+MACD Crossover (100% Cash),0.0000%
+Random Trader (12% Hourly),-0.0021%
+MACD Crossover (100% Cash),-0.0315%
+SMA Derivative Trade,-0.0401%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.0498%
+MACD Histo Derivative (100% Cash),-0.1226%
 Perfect Foresight (Max Return Long Benchmark),1.2497%
 Perfect Foresight (Max Return Short Benchmark),0.9252%
-Random Trader (1% Chance),0.5887%
+PPO-Agent (SPY),0.4797%
 Swing Low Support (15m),0.4797%
 Triple SMA (13/21/55) + 8 EMA Crossover,0.3302%
 EMA Crossover (100% Cash),0.2399%
 SMA Crossover (100% Cash),0.1597%
+DQN-Agent (SPY),0.1400%
+Random Trader (1% Chance),0.0704%
+SMA Derivative Trade,0.0448%
+Random Trader (12% Hourly),0.0336%
+All-In-One Hybrid (1/5th Split),0.0300%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+MACD Crossover (100% Cash),-0.0609%
+MACD Crossover (100% Cash),-0.0954%
+MACD Histo Derivative (100% Cash),-0.1992%
+Q-Agent (SPY),-0.3119%
+Perfect Foresight (Max Return Long Benchmark),1.5236%
+Perfect Foresight (Max Return Short Benchmark),1.4707%
+PPO-Agent (SPY),0.5018%
+MACD Histo Derivative (100% Cash),0.1843%
+DQN-Agent (SPY),0.1141%
+Random Trader (1% Chance),0.0855%
+MACD Crossover (100% Cash),0.0317%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+SMA Crossover (100% Cash),-0.0087%
+Random Trader (12% Hourly),-0.0174%
+Q-Agent (SPY),-0.0471%
+All-In-One Hybrid (1/5th Split),-0.0629%
+SMA Derivative Trade,-0.1175%
+EMA Crossover (100% Cash),-0.1438%
+MACD Crossover (100% Cash),-0.2290%
+Swing Low Support (15m),-0.3374%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.4309%
+Perfect Foresight (Max Return Long Benchmark),1.0077%
+Perfect Foresight (Max Return Short Benchmark),0.8503%
+PPO-Agent (SPY),0.0522%
+Swing Low Support (15m),0.0522%
+Random Trader (1% Chance),0.0216%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+MACD Crossover (100% Cash),-0.0058%
+Random Trader (12% Hourly),-0.0250%
+MACD Crossover (100% Cash),-0.0290%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.0540%
+SMA Derivative Trade,-0.0580%
+All-In-One Hybrid (1/5th Split),-0.0826%
+EMA Crossover (100% Cash),-0.0985%
+SMA Crossover (100% Cash),-0.0985%
+MACD Histo Derivative (100% Cash),-0.1286%
+Q-Agent (SPY),-0.1560%
+DQN-Agent (SPY),-0.3391%
+Perfect Foresight (Max Return Long Benchmark),1.2497%
+Perfect Foresight (Max Return Short Benchmark),0.9252%
+PPO-Agent (SPY),0.4797%
+Swing Low Support (15m),0.4797%
+DQN-Agent (SPY),0.4354%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.3302%
+EMA Crossover (100% Cash),0.2399%
+SMA Crossover (100% Cash),0.1597%
+Random Trader (1% Chance),0.1216%
 SMA Derivative Trade,0.0448%
 All-In-One Hybrid (1/5th Split),0.0300%
-Random Trader (12% Hourly),0.0192%
+Random Trader (12% Hourly),0.0231%
 LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
 MACD Crossover (100% Cash),-0.0609%
-Q-Agent (SPY),-0.0655%
 MACD Crossover (100% Cash),-0.0954%
-DQN-Agent (SPY),-0.1806%
 MACD Histo Derivative (100% Cash),-0.1992%
+Q-Agent (SPY),-0.2865%
+Perfect Foresight (Max Return Short Benchmark),0.7333%
+Perfect Foresight (Max Return Long Benchmark),0.6605%
+Q-Agent (SPY),0.1400%
+Random Trader (12% Hourly),0.0389%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.0209%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+DQN-Agent (SPY),-0.0341%
+MACD Crossover (100% Cash),-0.0470%
+SMA Derivative Trade,-0.1285%
+MACD Histo Derivative (100% Cash),-0.1747%
+All-In-One Hybrid (1/5th Split),-0.2191%
+MACD Crossover (100% Cash),-0.2211%
+Random Trader (1% Chance),-0.2244%
+SMA Crossover (100% Cash),-0.2763%
+EMA Crossover (100% Cash),-0.2948%
+PPO-Agent (SPY),-0.5148%
+Swing Low Support (15m),-0.5148%
+Perfect Foresight (Max Return Long Benchmark),1.5151%
+Perfect Foresight (Max Return Short Benchmark),0.8573%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.7797%
+LSTM-Prediction Agent (SPY),0.7187%
+GRU-Prediction Agent (SPY),0.7187%
+SMA Derivative Trade,0.5687%
+SMA Crossover (100% Cash),0.2558%
+PPO-Agent (SPY),0.1687%
+All-In-One Hybrid (1/5th Split),0.1589%
+MACD Crossover (100% Cash),0.1468%
+Random Trader (12% Hourly),0.0766%
+MACD Crossover (100% Cash),0.0383%
+MACD Histo Derivative (100% Cash),0.0196%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+EMA Crossover (100% Cash),-0.0880%
+DQN-Agent (SPY),-0.2046%
+Q-Agent (SPY),-0.3512%
+Swing Low Support (15m),-0.4205%
+Random Trader (1% Chance),-0.4643%
+Perfect Foresight (Max Return Long Benchmark),0.7682%
+Perfect Foresight (Max Return Short Benchmark),0.6711%
+Q-Agent (SPY),0.0997%
+MACD Crossover (100% Cash),0.0751%
+MACD Crossover (100% Cash),0.0655%
+Random Trader (1% Chance),0.0601%
+Random Trader (12% Hourly),0.0342%
+DQN-Agent (SPY),0.0042%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+SMA Crossover (100% Cash),-0.0092%
+PPO-Agent (SPY),-0.0247%
+Swing Low Support (15m),-0.0247%
+SMA Derivative Trade,-0.0321%
+All-In-One Hybrid (1/5th Split),-0.0721%
+EMA Crossover (100% Cash),-0.1248%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.1404%
+MACD Histo Derivative (100% Cash),-0.2597%
+Perfect Foresight (Max Return Short Benchmark),3.2398%
+Perfect Foresight (Max Return Long Benchmark),3.1991%
+DQN-Agent (SPY),0.5453%
+MACD Histo Derivative (100% Cash),0.5392%
+All-In-One Hybrid (1/5th Split),0.0600%
+MACD Crossover (100% Cash),0.0476%
+Q-Agent (SPY),0.0317%
+Swing Low Support (15m),0.0240%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+SMA Derivative Trade,0.0000%
+Random Trader (12% Hourly),-0.0329%
+SMA Crossover (100% Cash),-0.0472%
+MACD Crossover (100% Cash),-0.1072%
+EMA Crossover (100% Cash),-0.2398%
+Random Trader (1% Chance),-0.3290%
+LSTM-Prediction Agent (SPY),-0.6473%
+GRU-Prediction Agent (SPY),-0.6473%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.6774%
+PPO-Agent (SPY),-0.8304%
+Perfect Foresight (Max Return Long Benchmark),0.7682%
+Perfect Foresight (Max Return Short Benchmark),0.6711%
+MACD Crossover (100% Cash),0.0751%
+MACD Crossover (100% Cash),0.0655%
+Q-Agent (SPY),0.0273%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+Random Trader (1% Chance),0.0000%
+SMA Crossover (100% Cash),-0.0092%
+DQN-Agent (SPY),-0.0218%
+PPO-Agent (SPY),-0.0247%
+Swing Low Support (15m),-0.0247%
+Random Trader (12% Hourly),-0.0252%
+SMA Derivative Trade,-0.0321%
+All-In-One Hybrid (1/5th Split),-0.0721%
+EMA Crossover (100% Cash),-0.1248%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.1404%
+MACD Histo Derivative (100% Cash),-0.2597%
 Perfect Foresight (Max Return Long Benchmark),0.7682%
 Perfect Foresight (Max Return Short Benchmark),0.6711%
 MACD Crossover (100% Cash),0.0751%
 MACD Crossover (100% Cash),0.0655%
 LSTM-Prediction Agent (SPY),0.0000%
-Random Trader (1% Chance),0.0000%
-Random Trader (12% Hourly),-0.0089%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+Random Trader (1% Chance),-0.0075%
 SMA Crossover (100% Cash),-0.0092%
+Random Trader (12% Hourly),-0.0145%
+DQN-Agent (SPY),-0.0218%
+PPO-Agent (SPY),-0.0247%
 Swing Low Support (15m),-0.0247%
 SMA Derivative Trade,-0.0321%
-Q-Agent (SPY),-0.0546%
 All-In-One Hybrid (1/5th Split),-0.0721%
 EMA Crossover (100% Cash),-0.1248%
 Triple SMA (13/21/55) + 8 EMA Crossover,-0.1404%
+Q-Agent (SPY),-0.1779%
 MACD Histo Derivative (100% Cash),-0.2597%
-DQN-Agent (SPY),-0.3560%
-Perfect Foresight (Max Return Long Benchmark),1.5151%
-Perfect Foresight (Max Return Short Benchmark),0.8573%
-Triple SMA (13/21/55) + 8 EMA Crossover,0.7797%
-LSTM-Prediction Agent (SPY),0.7187%
-SMA Derivative Trade,0.5687%
-SMA Crossover (100% Cash),0.2558%
-DQN-Agent (SPY),0.1610%
-All-In-One Hybrid (1/5th Split),0.1589%
-MACD Crossover (100% Cash),0.1468%
-Random Trader (12% Hourly),0.0575%
-MACD Crossover (100% Cash),0.0383%
-MACD Histo Derivative (100% Cash),0.0196%
-Q-Agent (SPY),-0.0332%
-Random Trader (1% Chance),-0.0662%
-EMA Crossover (100% Cash),-0.0880%
-Swing Low Support (15m),-0.4205%
 Perfect Foresight (Max Return Short Benchmark),1.6277%
 Perfect Foresight (Max Return Long Benchmark),1.1561%
-Random Trader (1% Chance),0.1926%
-Q-Agent (SPY),0.1767%
+DQN-Agent (SPY),0.2146%
 MACD Crossover (100% Cash),0.1340%
 Triple SMA (13/21/55) + 8 EMA Crossover,0.0879%
-DQN-Agent (SPY),0.0000%
 LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
 EMA Crossover (100% Cash),-0.0062%
 SMA Derivative Trade,-0.0087%
 MACD Crossover (100% Cash),-0.0248%
-Random Trader (12% Hourly),-0.0262%
+Q-Agent (SPY),-0.0328%
+Random Trader (12% Hourly),-0.0658%
+PPO-Agent (SPY),-0.0757%
 All-In-One Hybrid (1/5th Split),-0.0914%
 SMA Crossover (100% Cash),-0.1090%
 MACD Histo Derivative (100% Cash),-0.3083%
 Swing Low Support (15m),-0.3523%
+Random Trader (1% Chance),-1.0108%
+Perfect Foresight (Max Return Short Benchmark),1.6277%
+Perfect Foresight (Max Return Long Benchmark),1.1561%
+Random Trader (1% Chance),0.4430%
+Q-Agent (SPY),0.1422%
+MACD Crossover (100% Cash),0.1340%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.0879%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+EMA Crossover (100% Cash),-0.0062%
+SMA Derivative Trade,-0.0087%
+DQN-Agent (SPY),-0.0149%
+MACD Crossover (100% Cash),-0.0248%
+PPO-Agent (SPY),-0.0757%
+All-In-One Hybrid (1/5th Split),-0.0914%
+SMA Crossover (100% Cash),-0.1090%
+Random Trader (12% Hourly),-0.1114%
+MACD Histo Derivative (100% Cash),-0.3083%
+Swing Low Support (15m),-0.3523%
+Perfect Foresight (Max Return Long Benchmark),1.0077%
+Perfect Foresight (Max Return Short Benchmark),0.8503%
+PPO-Agent (SPY),0.0522%
+Swing Low Support (15m),0.0522%
+Random Trader (12% Hourly),0.0026%
+LSTM-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+MACD Crossover (100% Cash),-0.0058%
+MACD Crossover (100% Cash),-0.0290%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.0540%
+SMA Derivative Trade,-0.0580%
+Random Trader (1% Chance),-0.0610%
+All-In-One Hybrid (1/5th Split),-0.0826%
+EMA Crossover (100% Cash),-0.0985%
+SMA Crossover (100% Cash),-0.0985%
+GRU-Prediction Agent (SPY),-0.1253%
+MACD Histo Derivative (100% Cash),-0.1286%
+Q-Agent (SPY),-0.3044%
+DQN-Agent (SPY),-0.3391%
+Perfect Foresight (Max Return Long Benchmark),1.5236%
+Perfect Foresight (Max Return Short Benchmark),1.4707%
+Q-Agent (SPY),0.8420%
+Random Trader (1% Chance),0.5311%
+PPO-Agent (SPY),0.5018%
+GRU-Prediction Agent (SPY),0.2132%
+MACD Histo Derivative (100% Cash),0.1843%
+DQN-Agent (SPY),0.1141%
+MACD Crossover (100% Cash),0.0317%
+LSTM-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+SMA Crossover (100% Cash),-0.0087%
+Random Trader (12% Hourly),-0.0214%
+All-In-One Hybrid (1/5th Split),-0.0629%
+SMA Derivative Trade,-0.1175%
+EMA Crossover (100% Cash),-0.1438%
+MACD Crossover (100% Cash),-0.2290%
+Swing Low Support (15m),-0.3374%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.4309%
+Perfect Foresight (Max Return Long Benchmark),0.7682%
+Perfect Foresight (Max Return Short Benchmark),0.6711%
+Random Trader (1% Chance),0.2370%
+MACD Crossover (100% Cash),0.0751%
+MACD Crossover (100% Cash),0.0655%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+SMA Crossover (100% Cash),-0.0092%
+PPO-Agent (SPY),-0.0247%
+Swing Low Support (15m),-0.0247%
+SMA Derivative Trade,-0.0321%
+Q-Agent (SPY),-0.0393%
+Random Trader (12% Hourly),-0.0563%
+All-In-One Hybrid (1/5th Split),-0.0721%
+EMA Crossover (100% Cash),-0.1248%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.1404%
+MACD Histo Derivative (100% Cash),-0.2597%
+DQN-Agent (SPY),-0.5018%
+Perfect Foresight (Max Return Long Benchmark),0.9645%
+Perfect Foresight (Max Return Short Benchmark),0.7234%
+SMA Crossover (100% Cash),0.4570%
+Random Trader (1% Chance),0.2594%
+PPO-Agent (SPY),0.1716%
+Swing Low Support (15m),0.1716%
+EMA Crossover (100% Cash),0.1296%
+All-In-One Hybrid (1/5th Split),0.0785%
+Random Trader (12% Hourly),0.0315%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+MACD Crossover (100% Cash),0.0000%
+MACD Crossover (100% Cash),-0.0315%
+SMA Derivative Trade,-0.0401%
+Q-Agent (SPY),-0.0419%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.0498%
+DQN-Agent (SPY),-0.1147%
+MACD Histo Derivative (100% Cash),-0.1226%
 Perfect Foresight (Max Return Short Benchmark),3.2398%
 Perfect Foresight (Max Return Long Benchmark),3.1991%
-Random Trader (1% Chance),2.4043%
 MACD Histo Derivative (100% Cash),0.5392%
-Random Trader (12% Hourly),0.1826%
-DQN-Agent (SPY),0.1264%
+Random Trader (1% Chance),0.4973%
+Q-Agent (SPY),0.1072%
 All-In-One Hybrid (1/5th Split),0.0600%
 MACD Crossover (100% Cash),0.0476%
+DQN-Agent (SPY),0.0378%
 Swing Low Support (15m),0.0240%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
 SMA Derivative Trade,0.0000%
 SMA Crossover (100% Cash),-0.0472%
+Random Trader (12% Hourly),-0.0930%
 MACD Crossover (100% Cash),-0.1072%
 EMA Crossover (100% Cash),-0.2398%
-Q-Agent (SPY),-0.6242%
 LSTM-Prediction Agent (SPY),-0.6473%
 Triple SMA (13/21/55) + 8 EMA Crossover,-0.6774%
+PPO-Agent (SPY),-0.8304%
+Perfect Foresight (Max Return Long Benchmark),1.0077%
+Perfect Foresight (Max Return Short Benchmark),0.8503%
+PPO-Agent (SPY),0.0522%
+Swing Low Support (15m),0.0522%
+Random Trader (1% Chance),0.0242%
+Random Trader (12% Hourly),0.0158%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+MACD Crossover (100% Cash),-0.0058%
+DQN-Agent (SPY),-0.0097%
+MACD Crossover (100% Cash),-0.0290%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.0540%
+SMA Derivative Trade,-0.0580%
+All-In-One Hybrid (1/5th Split),-0.0826%
+EMA Crossover (100% Cash),-0.0985%
+SMA Crossover (100% Cash),-0.0985%
+LSTM-Prediction Agent (SPY),-0.1253%
+GRU-Prediction Agent (SPY),-0.1253%
+MACD Histo Derivative (100% Cash),-0.1286%
+Q-Agent (SPY),-0.2567%
+Perfect Foresight (Max Return Long Benchmark),1.2497%
+Perfect Foresight (Max Return Short Benchmark),0.9252%
+PPO-Agent (SPY),0.4797%
+Swing Low Support (15m),0.4797%
+DQN-Agent (SPY),0.3801%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.3302%
+EMA Crossover (100% Cash),0.2399%
+SMA Crossover (100% Cash),0.1597%
+SMA Derivative Trade,0.0448%
+Random Trader (12% Hourly),0.0387%
+All-In-One Hybrid (1/5th Split),0.0300%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+MACD Crossover (100% Cash),-0.0609%
+LSTM-Prediction Agent (SPY),-0.0789%
+Q-Agent (SPY),-0.0954%
+MACD Crossover (100% Cash),-0.0954%
+Random Trader (1% Chance),-0.1391%
+MACD Histo Derivative (100% Cash),-0.1992%
+Perfect Foresight (Max Return Short Benchmark),1.6277%
+Perfect Foresight (Max Return Long Benchmark),1.1561%
+DQN-Agent (SPY),0.1910%
+MACD Crossover (100% Cash),0.1340%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.0879%
+Random Trader (1% Chance),0.0317%
+Random Trader (12% Hourly),0.0184%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+EMA Crossover (100% Cash),-0.0062%
+SMA Derivative Trade,-0.0087%
+Q-Agent (SPY),-0.0130%
+MACD Crossover (100% Cash),-0.0248%
+PPO-Agent (SPY),-0.0757%
+All-In-One Hybrid (1/5th Split),-0.0914%
+SMA Crossover (100% Cash),-0.1090%
+MACD Histo Derivative (100% Cash),-0.3083%
+Swing Low Support (15m),-0.3523%
+Perfect Foresight (Max Return Long Benchmark),0.8436%
+Perfect Foresight (Max Return Short Benchmark),0.7739%
+SMA Crossover (100% Cash),0.4843%
+DQN-Agent (SPY),0.3245%
+Q-Agent (SPY),0.2710%
+EMA Crossover (100% Cash),0.1814%
+All-In-One Hybrid (1/5th Split),0.1047%
+PPO-Agent (SPY),0.0951%
+Swing Low Support (15m),0.0951%
+Random Trader (12% Hourly),0.0381%
+MACD Crossover (100% Cash),0.0130%
+MACD Crossover (100% Cash),0.0072%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+SMA Derivative Trade,-0.0688%
+MACD Histo Derivative (100% Cash),-0.0804%
+Triple SMA (13/21/55) + 8 EMA Crossover,-0.1033%
+Random Trader (1% Chance),-0.3173%
+Perfect Foresight (Max Return Short Benchmark),1.6277%
+Perfect Foresight (Max Return Long Benchmark),1.1561%
+MACD Crossover (100% Cash),0.1340%
+Q-Agent (SPY),0.0941%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.0879%
+DQN-Agent (SPY),0.0412%
+Random Trader (12% Hourly),0.0249%
+LSTM-Prediction Agent (SPY),0.0000%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+EMA Crossover (100% Cash),-0.0062%
+SMA Derivative Trade,-0.0087%
+MACD Crossover (100% Cash),-0.0248%
+PPO-Agent (SPY),-0.0757%
+All-In-One Hybrid (1/5th Split),-0.0914%
+SMA Crossover (100% Cash),-0.1090%
+MACD Histo Derivative (100% Cash),-0.3083%
+Swing Low Support (15m),-0.3523%
+Random Trader (1% Chance),-0.9422%
+Perfect Foresight (Max Return Long Benchmark),1.2497%
+Perfect Foresight (Max Return Short Benchmark),0.9252%
+PPO-Agent (SPY),0.4797%
+Swing Low Support (15m),0.4797%
+DQN-Agent (SPY),0.3394%
+Triple SMA (13/21/55) + 8 EMA Crossover,0.3302%
+EMA Crossover (100% Cash),0.2399%
+Q-Agent (SPY),0.1874%
+SMA Crossover (100% Cash),0.1597%
+SMA Derivative Trade,0.0448%
+All-In-One Hybrid (1/5th Split),0.0300%
+Random Trader (12% Hourly),0.0227%
+GRU-Prediction Agent (SPY),0.0000%
+XGB-Agent (SPY),0.0000%
+RF-Agent (SPY),0.0000%
+MACD Crossover (100% Cash),-0.0609%
+LSTM-Prediction Agent (SPY),-0.0789%
+MACD Crossover (100% Cash),-0.0954%
+MACD Histo Derivative (100% Cash),-0.1992%
+Random Trader (1% Chance),-0.4298%
